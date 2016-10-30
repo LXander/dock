@@ -37,7 +37,13 @@ def submit_jobarray(Jobarray, start, end):
     sys.stderr.write("submit job %s to %s\n\n" % (start, end))
     #os.remove(Jobarray)
 
+def extract_file(script_index):
+    r = os.popen('python %s filter %s'%(config.FILTER,config.ROW_FILE[script_index]))
+    for line in r.readlines():
+        sys.stderr.write(line)
+
 def check_loop(script_index,debug_flag):
+    extract_file(script_index)
     docking_num = 0
     with open(config.COMMANDS_FILE[script_index]) as fr:
         for line in fr:

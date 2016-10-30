@@ -16,6 +16,6 @@ COMMANDS_FILE = [
     os.path.join(_SCRIPT, 'filter_new_so_rigorous.txt')
 ]
 
-JOBARRAY = '/hone/xl198/code/bucket'
+JOBARRAY = '/home/xl198/code/bucket'
 
 RUN = os.path.join(os.getcwd(),'run.py')

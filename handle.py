@@ -9,7 +9,7 @@ def get_job_num():
     return num
 
 def create_jobarray(start, end, script_index, debug_flag):
-    Jobarray_name = 'jobarray_' + start + '.sh'
+    Jobarray_name = 'jobarray_' + str(start) + '.sh'
     Jobarray = os.path.join(config.JOBARRAY,Jobarray_name)
     with open(Jobarray,'w') as job:
         job.write('#!/bin/bash\n')

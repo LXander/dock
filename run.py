@@ -4,7 +4,7 @@ import subprocess
 import config
 import util
 
-def docking(script_index,index,debug_flag):
+def docking(script_index,index_offset,index,debug_flag):
     script_file = config.COMMANDS_FILE[script_index]
     script_file = util.path_check(script_file)
 
@@ -13,14 +13,14 @@ def docking(script_index,index,debug_flag):
         # read one line
         # jobindex start as 1 but list start at 0
 
-        command = fr.readlines()[index-1]
+        command = fr.readlines()[index_offset+index-1]
 
         util.debug(debug_flag,"Running command %s",(command))
 
         subprocess.call(command, shell=True)
 
 def main():
-    # eg : python run.py 1 2 -d
+    # eg : python run.py 1 1000  2 -d
     try:
         opts, args = getopt.getopt(sys.argv[1:], "d", ["help", "output="])
     except getopt.GetoptError as err:
@@ -31,7 +31,8 @@ def main():
 
 
     script_index = int(args[0])
-    index = int(args[1])
+    index_offset = int(args[1])
+    index = int(args[2])
 
     #if -d display debug information
     debug_flag = False
@@ -40,7 +41,7 @@ def main():
             debug_flag = True
 
 
-    docking(script_index, index, debug_flag)
+    docking(script_index,index_offset, index, debug_flag)
 
 if __name__ == '__main__':
     main()

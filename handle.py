@@ -8,7 +8,7 @@ def get_job_num():
     num = int(r.readline().strip('\n'))
     return num
 
-def create_jobarray(start, end, script_index, debug_flag):
+def create_jobarray(start, end, offset, script_index, debug_flag):
     Jobarray_name = 'jobarray_' + str(start) + '.sh'
     Jobarray = os.path.join(config.JOBARRAY,Jobarray_name)
     with open(Jobarray,'w') as job:
@@ -25,7 +25,7 @@ def create_jobarray(start, end, script_index, debug_flag):
         job.write('export OMP_NUM_THREADS=1\n')
         job.write('export LC_ALL="en_US.UTF-8"\n')
         job.write('source /home/xl198/venv/data/bin/activate\n')
-        job.write('python %s %s ${LSB_JOBINDEX} %s\n'%(config.RUN,script_index,'-d'if debug_flag else ''))
+        job.write('python %s %s %s ${LSB_JOBINDEX} %s\n'%(config.RUN,script_index, offset,'-d'if debug_flag else ''))
 
 
     return Jobarray
@@ -51,24 +51,25 @@ def check_loop(script_index,debug_flag):
 
     sys.stderr.write("\nopen script file : %s\n"%config.COMMANDS_FILE[script_index])
     sys.stderr.write("total commands num : %s\n"%docking_num)
+    offset = 0
     start = 1
-    end = start + 1000 if start + 1000 <= docking_num else docking_num
+    end = offset + 1000 if offset + 1000 <= docking_num else docking_num
     while(1):
-        if start >= docking_num:
+        if offset >= docking_num:
             sys.stderr.write('\nFinish\n')
             exit(0)
         num = get_job_num()
         if num<100:
-            Jobarray = create_jobarray(start,end,script_index,debug_flag)
-            submit_jobarray(Jobarray,start,end)
+            Jobarray = create_jobarray(start,end, offset,script_index,debug_flag)
+            submit_jobarray(Jobarray,start+offset,end+offset)
             start = end
-            end = start + 1000 if start + 1000 <= docking_num else docking_num
+            end = offset + 1000 if offset + 1000 <= docking_num else docking_num
 
         time.sleep(600)
 
 
 def main():
-    # eg : python handle.py 1 2 -d
+    # eg : python handle.py 1 -d
     try:
         opts, args = getopt.getopt(sys.argv[1:], "d", ["help", "output="])
     except getopt.GetoptError as err:
@@ -77,8 +78,9 @@ def main():
 
         sys.exit(2)
 
+ 
     script_index = int(args[0])
-
+    
     # if -d display debug information
     debug_flag = False
     for o, a in opts:

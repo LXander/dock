@@ -3,6 +3,7 @@ import os
 import subprocess
 import config
 import util
+import time
 
 def docking(script_index,index_offset,index,debug_flag):
     script_file = config.COMMANDS_FILE[script_index]
@@ -18,7 +19,8 @@ def docking(script_index,index_offset,index,debug_flag):
         util.debug(debug_flag,"Running command %s",(command))
 
         subprocess.call(command, shell=True)
-
+	time.sleep(60)
+	
 def main():
     # eg : python run.py 1 1000  2 -d
     try:

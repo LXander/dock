@@ -62,7 +62,7 @@ def check_loop(script_index,debug_flag):
         if num<100:
             Jobarray = create_jobarray(start,end, offset,script_index,debug_flag)
             submit_jobarray(Jobarray,start+offset,end+offset)
-            start = end
+            offset = end
             end = offset + 1000 if offset + 1000 <= docking_num else docking_num
 
         time.sleep(600)

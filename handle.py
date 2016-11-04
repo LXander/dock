@@ -9,13 +9,13 @@ def get_job_num():
     return num
 
 def create_jobarray(start, end, offset, script_index, debug_flag):
-    Jobarray_name = 'jobarray_' + str(start) + '.sh'
+    Jobarray_name = 'jobarray_' + str(offset) + '.sh'
     Jobarray = os.path.join(config.JOBARRAY,Jobarray_name)
     with open(Jobarray,'w') as job:
         job.write('#!/bin/bash\n')
         job.write('#BSUB -n 1                #each  job run on 1 core\n')
         job.write('#BSUB -W 12:00            #job run 12 hour\n')
-        job.write('#BSUB -J jobArray[%s-%s] #job array list goes begin,begin+1,begin+2...end\n' % (start, end))
+        job.write('#BSUB -J jobArray[1-1000] #job array list goes begin,begin+1,begin+2...end\n')
         job.write('#BSUB -o '+config.JOBARRAY+'/%J.%I.out        #lsf output file\n')
         job.write('#BSUB -e '+config.JOBARRAY+'/%J.%I.err       #lsf error file\n')
         job.write('#BSUB -q short         #submit to "short" queue\n')
@@ -59,9 +59,9 @@ def check_loop(script_index,debug_flag):
             sys.stderr.write('\nFinish\n')
             exit(0)
         num = get_job_num()
-        if num<100:
+        if num<500:
             Jobarray = create_jobarray(start,end, offset,script_index,debug_flag)
-            submit_jobarray(Jobarray,start+offset,end+offset)
+            submit_jobarray(Jobarray,start+offset,end)
             offset = end
             end = offset + 1000 if offset + 1000 <= docking_num else docking_num
 

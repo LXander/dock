@@ -19,6 +19,8 @@ def docking(script_index,index_offset,index,debug_flag):
         util.debug(debug_flag,"Running command %s",(command))
 
         subprocess.call(command, shell=True)
+	sys.stderr.write("offset %s, order %s\n"%(index_offset,index_offset+index))
+	sys.stderr.write(command)
 	time.sleep(60)
 	
 def main():

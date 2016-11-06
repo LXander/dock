@@ -1,6 +1,7 @@
 import os,sys
 
 def path_check(path):
+    # to check if a path is exists
     if not os.path.exists(path):
         print "%s not exists!"%path
         exit(1)
@@ -8,5 +9,6 @@ def path_check(path):
         return path
 
 def debug(debug_flag,output,content):
+    # print debug information into stdout
     if debug_flag:
         print output%content

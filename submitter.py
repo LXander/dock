@@ -38,9 +38,14 @@ def submit_jobarray(Jobarray, base):
     #os.remove(Jobarray)
 
 def check_loop():
-    base = config.BASE_YI
-    files = os.listdir(base)
-    total = len(files)
+    count = 0
+    # mol2 file organized in input_path
+    input_path = os.path.join(config.BASE_DATA, 'result')
+
+    for dirname, dirnames, filenames in os.walk(input_path):
+        count += len(filenames)
+
+    total = count
 
     sys.stderr.write("\nConvert mol2 into pdb\n")
     sys.stderr.write("total commands num : %s\n"%total)

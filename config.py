@@ -27,7 +27,7 @@ JOBARRAY = '/home/xl198/code/bucket'
 
 FILTER = os.path.join(_SCRIPT,'run.py')
 RUN = os.path.join(os.getcwd(),'run.py')
-CONVERT = os.path.join(os.getcwd(),'new_line_inserter.py')
+CONVERT = os.path.join(os.getcwd(),'get_split_ligands.py')
 
 # _BASE_SELECT and ROW_FOLDER are used in select.py
 _BASE_SELECT = '/n/scratch2/xl198/data/select'
@@ -47,3 +47,6 @@ BASE_YI = '/n/scratch2/yw174/result/fast'
 
 BASE_CONVERT = '/n/scratch2/xl198/data/result'
 BASE_CONVERT2PDB = '/n/scratch2/xl198/data/pdbs'
+
+# BASE_DATA is the root directory of almost all the operation
+BASE_DATA = '/n/scratch2/xl198/data'

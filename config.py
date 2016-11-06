@@ -44,4 +44,4 @@ ROW_FOLDER = {
 # BASE_CONVERT is used in new_line_inserter.py
 BASE_YI = '/n/scratch2/yw174/result/fast'
 
-BASE_CONVERT = '/n/scrarch2/xl198/data/result'
+BASE_CONVERT = '/n/scratch2/xl198/data/result'

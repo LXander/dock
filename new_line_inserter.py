@@ -29,20 +29,21 @@ def get_all(num = None):
     files = os.listdir(base)
     size = num if num != None else len(files)
     sys.stderr.write("Convert %s files\n"%size)
-    sys.stderr.write("first file is "%(os.path.join(base,files[0])))
+    sys.stderr.write("first file is %s\n"%(os.path.join(base,files[0])))
     for i in range(size):
         run(os.path.join(base,files[i]))
-        sys.stderr("write %d/%d\n"%(i+1,size))
+        sys.stderr.write("write %d/%d\n"%(i+1,size))
         
 
 def main():
     args = sys.argv
-    if len(args)<=2:
+    if len(args)<2:
         num = None
     else:
         num = int(args[1])
 
     print num
+    get_all(num)
 
 if __name__ == '__main__':
    main()

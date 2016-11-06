@@ -1,6 +1,7 @@
 import os, sys
 import config
 import re
+import shutil
 
 '''
     This file is used to get seperated pdb file from Yi's folder
@@ -73,6 +74,36 @@ def convert(input_file):
         os.system(cmd3)
         os.system(cmd4)
 
+def get_pdb_and_crystal(input_file):
+    # source to place crystal ligand
+    crystal_source = os.path.join(config.BASE_DATA, 'H', 'addH')
+    # dest to place converted ligand
+    crystal_dest = os.path.join(config.BASE_DATA, 'select', 'crystal')
+
+    # source to place pdb
+    pdb_source = os.path.join(config.BASE_DATA, 'H', 'data')
+    # dest to place pdb
+    pdb_dest = os.path.join(config.BASE_CONVERT, 'select', 'receptor')
+
+    dirname = os.path.dirname(input_file)
+    receptor = os.path.basename(dirname)
+    filename = os.path.basename(input_file).split('.')[0]
+
+    receptor_in = os.path.join(pdb_source,receptor,receptor+'.pdb')
+    shutil.copy(receptor_in,pdb_dest)
+
+    crystal_in = os.path.join(crystal_source,receptor,filename+'.pdb')
+    crystal_path = os.path.join(crystal_dest,receptor)
+    if not os.path.exists(crystal_path):
+        os.mkdir(crystal_path)
+
+    crystal_out = os.path.join(crystal_path,filename+'.pdb')
+
+    cmd = 'obabel -ipdb %s -opdb -O %s -d'%(crystal_in,crystal_out)
+    os.system(cmd)
+
+
+
 
 def run(base, offset):
     # JobId start at 1
@@ -93,8 +124,9 @@ def run(base, offset):
 
     if file_path and re.search('.mol$', file_path):
         # get the mol file we need
-        print "convert"
-        convert(file_path)
+        print "get"
+        #convert(file_path)
+        get_pdb_and_crystal(file_path)
 
 
 def main():

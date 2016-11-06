@@ -1,5 +1,6 @@
 import config
 import os,sys
+import subprocess
 import time
 
 '''
@@ -8,6 +9,18 @@ import time
     and insert newline into it or it can't be read into obabel
 
 '''
+
+def convert(raw_file_path):
+    file_name = os.path.basename(raw_file_path)
+    receptor_name = file_name.split('_')[0]
+    output_path = os.path.join(config.BASE_CONVERT2PDB, receptor_name)
+    if not os.path.exists(output_path):
+        os.mkdir(output_path)
+
+    input_file_path = os.path.join(config.BASE_CONVERT,receptor_name,file_name)
+    output_file_path = os.path.join(output_path,file_name.split('.')[0] + '.pdb')
+    subprocess.call('obabel -i mol2 %s -o pdb -O %s'%(input_file_path,output_file_path))
+
 
 def run(input_file_path):
     file_name = os.path.basename(input_file_path)
@@ -33,10 +46,23 @@ def get_all(num = None):
     for i in range(size):
         run(os.path.join(base,files[i]))
         sys.stderr.write("write %d/%d\n"%(i+1,size))
+
+def run_convert(base,offset):
+    base = config.BASE_YI
+    files = os.listdir(base)
+    index = base*1000+offset
+    if len(files)>index:
+        convert(os.path.join(base,files[index]))
+        
         
 
 def main():
     args = sys.argv
+    base  = int(args[1])
+    offset = int(args[2])
+
+
+    '''
     if len(args)<2:
         num = None
     else:
@@ -44,6 +70,7 @@ def main():
 
     print num
     get_all(num)
+    '''
 
 if __name__ == '__main__':
    main()

@@ -17,7 +17,7 @@ import re
 '''
 
 # if only few ligand in the best and worst won't very difference
-minimum_ligand_num = 100
+minimum_ligand_num = 20
 # mol2 file organized in input_path
 input_path = os.path.join(config.BASE_DATA,'result')
 # select and convert pdb file to output_path
@@ -28,9 +28,11 @@ def convert(input_file):
     ligand_count = 0
     with open(input_file) as input:
         for line in input:
-            if line == '@<TRIPOS>MOLECULE':
+            if line == '@<TRIPOS>MOLECULE\n':
                 ligand_count += 1
 
+    print "ligand_count %d"%ligand_count
+    
     dirname = os.path.dirname(input_file)
     receptor = os.path.basename(dirname)
     filename = os.path.basename(input_file).split('.')[0]
@@ -41,11 +43,14 @@ def convert(input_file):
 
     if ligand_count > minimum_ligand_num:
         # convert top 10 ligand
-        os.system('obabel -imol2 %s -f %d -l %d -opdb -O %s -d'%
-                  (input_file,1,10,os.path.join(ligand_output_path,filename,'_top_.pdb')))
+        os.system('obabel -imol2 -m %s -f %d -l %d -opdb -O %s -d '%
+                  (input_file,1,10,os.path.join(ligand_output_path,filename+'_top_.pdb')))
         # convert bottom 10 ligand
-        os.system('obabel -imol2 %s -f %d -l %d -opdb -O %s -d' %
-                  (input_file, ligand_count-10, ligand_count, os.path.join(ligand_output_path, filename, '_top_.pdb')))
+	cmd = 'obabel -imol2 -m %s -f %d -l %d -opdb -O %s -d ' %
+                  (input_file, ligand_count-9, ligand_count, os.path.join(ligand_output_path, filename+'_top_.pdb'))
+	print cmd
+        os.system('obabel -imol2 -m %s -f %d -l %d -opdb -O %s -d ' %
+                  (input_file, ligand_count-9, ligand_count, os.path.join(ligand_output_path, filename+'_top_.pdb')))
 
 
 
@@ -67,13 +72,20 @@ def run(base,offset):
         else:
             cur -= len(filenames)
 
+    #print 'file_path '+file_path
+    
     if file_path and re.search('.mol$',file_path):
         # get the mol file we need
+	print "convert"
         convert(file_path)
 
-def mian():
+def main():
     args = sys.argv
     if len(args)>=3:
         base = int(args[1])
         offset = int(args[2])
+	print 'base %d offset %d'%(base,offset)
         run(base,offset)
+
+if __name__ == '__main__':
+    main()

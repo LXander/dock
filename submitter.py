@@ -51,10 +51,10 @@ def check_loop():
     sys.stderr.write("total commands num : %s\n"%total)
     cur = 0
     base = 0
-    
+    i = 1 
     #base = offset + 1000 if offset + 1000 <= docking_num else docking_num
     while(1):
-	
+	i = 0
         if base*1000 >= total:
             sys.stderr.write('\nFinish\n')
             exit(0)

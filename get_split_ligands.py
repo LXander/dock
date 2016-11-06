@@ -51,9 +51,10 @@ def convert(input_file):
         cmd1 = 'obabel -imol2 %s -f %d -l %d -opdb -O %s -d ' %\
               (input_file, 1, 10, tmp1)
 
-        cmd2 = 'obabel -imol2 -m %s  -opdb -O %s -d ' %\
+        cmd2 = 'obabel -ipdb -m %s  -opdb -O %s -d ' %\
               (tmp1, os.path.join(ligand_output_path,top))
-
+	#print(cmd1)
+	#print(cmd2)
         os.system(cmd1)
         os.system(cmd2)
 
@@ -64,7 +65,7 @@ def convert(input_file):
         cmd3 = 'obabel -imol2 %s -f %d -l %d -opdb -O %s -d ' % \
               (input_file, ligand_count - 9, ligand_count, tmp2)
 
-        cmd4 = 'obabel -imol2 -m %s  -opdb -O %s -d ' % \
+        cmd4 = 'obabel -ipdb -m %s  -opdb -O %s -d ' % \
                (tmp2, os.path.join(ligand_output_path, bottom))
 
 

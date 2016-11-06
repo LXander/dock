@@ -1,6 +1,6 @@
 import config
 import os,sys
-import subprocess
+#import subprocess
 import time
 
 '''
@@ -19,7 +19,7 @@ def convert(raw_file_path):
 
     input_file_path = os.path.join(config.BASE_CONVERT,receptor_name,file_name)
     output_file_path = os.path.join(output_path,file_name.split('.')[0] + '.pdb')
-    subprocess.call('obabel -i mol2 %s -o pdb -O %s'%(input_file_path,output_file_path))
+    os.system('obabel -i mol2 %s -o pdb -O %s'%(input_file_path,output_file_path))
 
 
 def run(input_file_path):
@@ -48,11 +48,14 @@ def get_all(num = None):
         sys.stderr.write("write %d/%d\n"%(i+1,size))
 
 def run_convert(base,offset):
-    base = config.BASE_YI
-    files = os.listdir(base)
+    base_path = config.BASE_YI
+    files = os.listdir(base_path)
+    #print base
+    #print offset
     index = base*1000+offset
+  
     if len(files)>index:
-        convert(os.path.join(base,files[index]))
+        convert(os.path.join(base_path,files[index]))
         
         
 
@@ -60,8 +63,9 @@ def main():
     args = sys.argv
     base  = int(args[1])
     offset = int(args[2])
-
-
+    
+    run_convert(base,offset)
+    sys.stderr.write("run convert %s"%(base*1000+offset))
     '''
     if len(args)<2:
         num = None

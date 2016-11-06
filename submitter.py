@@ -46,11 +46,14 @@ def check_loop():
     sys.stderr.write("total commands num : %s\n"%total)
     cur = 0
     base = 0
+    
     #base = offset + 1000 if offset + 1000 <= docking_num else docking_num
     while(1):
+	
         if base*1000 >= total:
             sys.stderr.write('\nFinish\n')
             exit(0)
+	
         num = get_job_num()
         if num<500:
             Jobarray = create_jobarray(base)
@@ -58,7 +61,9 @@ def check_loop():
 
             #end = offset + 1000 if offset + 1000 <= docking_num else docking_num
 
-        time.sleep(6)
+            base +=1
+
+	time.sleep(6)
 
 if __name__ == '__main__':
     check_loop()

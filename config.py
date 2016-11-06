@@ -27,3 +27,21 @@ JOBARRAY = '/home/xl198/code/bucket'
 
 FILTER = os.path.join(_SCRIPT,'run.py')
 RUN = os.path.join(os.getcwd(),'run.py')
+
+# _BASE_SELECT and ROW_FOLDER are used in select.py
+_BASE_SELECT = '/n/scratch2/xl198/data/select'
+COMMANDS_SELECT = {
+    'temp' :  os.path.join(_BASE_SELECT,'temp'),
+    'final' : os.path.join(_BASE_SELECT,'final')
+}
+
+ROW_FOLDER = {
+    'wp_fast': os.path.join(_BASE,'wp_fast'),
+    'wp_rigorous': os.path.join(_BASE,'wp_rigorous'),
+    'so_rigorous' : os.path.join(_BASE,'so_rigorous')
+}
+
+# BASE_CONVERT is used in new_line_inserter.py
+BASE_YI = '/n/scratch2/yw174/result/fast'
+
+BASE_CONVERT = '/n/scrarch2/xl198/data/result'

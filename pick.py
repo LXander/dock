@@ -121,6 +121,7 @@ class pickupexample:
             job.wait()
 	'''
 
+
         for input, output in picked_file:
             subprocess.call('obabel -i mol2 -f 1 -l 1 %s -o pdb -O %s' % (input, output), shell=True)
             # subprocess.call('obabel -i mol2 -m %s -o pdb -O %s'%(input,output),shell=True)

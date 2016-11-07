@@ -83,11 +83,11 @@ def get_pdb_and_crystal(input_file):
     # source to place pdb
     pdb_source = os.path.join(config.BASE_DATA, 'H', 'data')
     # dest to place pdb
-    pdb_dest = os.path.join(config.BASE_CONVERT, 'select', 'receptor')
+    pdb_dest = os.path.join(config.BASE_DATA, 'select', 'receptor')
 
     dirname = os.path.dirname(input_file)
     receptor = os.path.basename(dirname)
-    filename = os.path.basename(input_file).split('.')[0]
+    filename = os.path.basename(input_file).split('.')[0][:-5]
 
     receptor_in = os.path.join(pdb_source,receptor,receptor+'.pdb')
     shutil.copy(receptor_in,pdb_dest)
@@ -125,7 +125,7 @@ def run(base, offset):
     if file_path and re.search('.mol$', file_path):
         # get the mol file we need
         print "get"
-        #convert(file_path)
+        convert(file_path)
         get_pdb_and_crystal(file_path)
 
 

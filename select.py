@@ -23,6 +23,10 @@ import subprocess
     2. open it with smina and save it to temp folder
     3. delete hydrogen with obabel
 
+
+
+    ## Unfinished
+
 '''
 
 

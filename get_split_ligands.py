@@ -19,6 +19,8 @@ import shutil
 
 # if only few ligand in the best and worst won't very difference
 minimum_ligand_num = 20
+# if atoms num too small it won't be too different between each other
+minimum_atom_num = 100
 # mol2 file organized in input_path
 input_path = os.path.join(config.BASE_DATA, 'result')
 # select and convert pdb file to output_path
@@ -34,6 +36,17 @@ def convert(input_file):
 
     print "ligand_count %d" % ligand_count
 
+    flag = False
+    atom_num = 0
+    with open(input_file) as input:
+        for line in input:
+            if not flag and line == '@<TRIPOS>ATOM\n':
+                flag = True
+            elif line == '@<TRIPOS>BOND\n':
+                break
+            elif flag:
+                atom_num += 1
+
     dirname = os.path.dirname(input_file)
     receptor = os.path.basename(dirname)
     filename = os.path.basename(input_file).split('.')[0]
@@ -45,7 +58,7 @@ def convert(input_file):
     top = filename + '_top_.pdb'
     bottom = filename + '_bottom_.pdb'
 
-    if ligand_count > minimum_ligand_num:
+    if ligand_count >= minimum_ligand_num and atom_num >= minimum_atom_num:
         # convert top 10 ligand
         tmp1 = os.path.join('/tmp', top)
 

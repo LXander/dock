@@ -25,7 +25,7 @@ def create_jobarray(base):
         job.write('export OMP_NUM_THREADS=1\n')
         job.write('export LC_ALL="en_US.UTF-8"\n')
         job.write('source /home/xl198/venv/data/bin/activate\n')
-        job.write('python %s %s ${LSB_JOBINDEX} \n'%(config.CONVERT, base))
+        job.write('python %s %s ${LSB_JOBINDEX} \n'%(config.INSERT, base))
 
 
     return Jobarray
@@ -37,7 +37,7 @@ def submit_jobarray(Jobarray, base):
     sys.stderr.write("submit job %s to %s\n\n" % (base*1000, (base+1)*1000))
     #os.remove(Jobarray)
 
-def check_loop():
+def get_job_num_get_split():
     count = 0
     # mol2 file organized in input_path
     input_path = os.path.join(config.BASE_DATA, 'result')
@@ -45,7 +45,16 @@ def check_loop():
     for dirname, dirnames, filenames in os.walk(input_path):
         count += len(filenames)
 
-    total = count
+    return count
+
+def get_job_num_new_line_inserter():
+    input_path = config.BASE_YI
+    return len(os.listdir(input_path))
+
+def check_loop():
+
+
+    total = get_job_num_get_split()
 
     sys.stderr.write("\nConvert mol2 into pdb\n")
     sys.stderr.write("total commands num : %s\n"%total)

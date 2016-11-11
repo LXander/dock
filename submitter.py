@@ -25,7 +25,7 @@ def create_jobarray(base):
         job.write('export OMP_NUM_THREADS=1\n')
         job.write('export LC_ALL="en_US.UTF-8"\n')
         job.write('source /home/xl198/venv/data/bin/activate\n')
-        job.write('python %s %s ${LSB_JOBINDEX} \n'%(config.INSERT, base))
+        job.write('python %s %s ${LSB_JOBINDEX} \n'%(config.CONVERT, base))
 
 
     return Jobarray
@@ -59,7 +59,7 @@ def check_loop():
     sys.stderr.write("\nConvert mol2 into pdb\n")
     sys.stderr.write("total commands num : %s\n"%total)
     cur = 0
-    base = 0
+    base = 55
     i = 1 
     #base = offset + 1000 if offset + 1000 <= docking_num else docking_num
     while(1):

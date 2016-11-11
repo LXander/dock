@@ -11,9 +11,12 @@ import time
 '''
 
 def convert(raw_file_path):
+    print "convert"
     file_name = os.path.basename(raw_file_path)
     receptor_name = file_name.split('_')[0]
     output_path = os.path.join(config.BASE_CONVERT2PDB, receptor_name)
+    print output_path
+    print os.path.exists(output_path)
     if not os.path.exists(output_path):
         os.mkdir(output_path)
 
@@ -23,6 +26,7 @@ def convert(raw_file_path):
 
 
 def run(input_file_path):
+    
     file_name = os.path.basename(input_file_path)
     receptor_name = file_name.split('_')[0]
     output_path = os.path.join(config.BASE_CONVERT,receptor_name)
@@ -55,6 +59,7 @@ def run_convert(base,offset):
     index = base*1000+offset
   
     if len(files)>index:
+	run(os.path.join(base_path,files[index]))
         convert(os.path.join(base_path,files[index]))
         
         

@@ -51,3 +51,6 @@ BASE_CONVERT2PDB = '/n/scratch2/xl198/data/pdbs'
 
 # BASE_DATA is the root directory of almost all the operation
 BASE_DATA = '/n/scratch2/xl198/data'
+
+# REPORT is the folder to save the result
+REPORT = '/home/xl198/report'

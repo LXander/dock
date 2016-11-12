@@ -28,6 +28,9 @@ output_path = os.path.join(config.BASE_DATA, 'select', 'ligands')
 
 
 def convert(input_file):
+    # convert from mol2 file into split pdb format
+
+    # count the number of the single ligand in one file
     ligand_count = 0
     with open(input_file) as input:
         for line in input:
@@ -36,6 +39,8 @@ def convert(input_file):
 
     print "ligand_count %d" % ligand_count
 
+
+    # count the number of the atoms in ligand
     flag = False
     atom_num = 0
     with open(input_file) as input:
@@ -47,14 +52,20 @@ def convert(input_file):
             elif flag:
                 atom_num += 1
 
+    # prepare the output path and file name
     dirname = os.path.dirname(input_file)
     receptor = os.path.basename(dirname)
     filename = os.path.basename(input_file).split('.')[0]
 
+    # creat the folder if dones't exists
+    # ( [output_path_base]/[receptor_name]  )
+    # eg otuput_path_base [/n/scratch2/xl198/data/result/liagnds/]  receptor_name = [1a3b]
+    #    folder [/n/scratch2/xl198/data/result/ligands/1a3b]
     ligand_output_path = os.path.join(output_path, receptor)
     if not os.path.exists(ligand_output_path):
         os.mkdir(ligand_output_path)
 
+    # name the top 10 and bottom 10 to distinguish them
     top = filename + '_top_.pdb'
     bottom = filename + '_bottom_.pdb'
     print ligand_count

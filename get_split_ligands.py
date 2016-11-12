@@ -59,7 +59,7 @@ def convert(input_file):
     bottom = filename + '_bottom_.pdb'
     print ligand_count
     print atom_num
-    if ligand_count >= minimum_ligand_num and atom_num >= minimum_atom_num:
+    if ligand_count >= minimum_ligand_num:
         # convert top 10 ligand
         tmp1 = os.path.join('/tmp', top)
 

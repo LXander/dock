@@ -16,7 +16,7 @@ output_path = '/n/scratch2/xl198/data/test/preprocessed_database/'
 output_error_path = '/n/scratch2/xl198/data/test/ligands_with_preprocess_error'
 output_receptor_path = '/n/scratch2/xl198/data/test/preprocessed_rectprot_database'
 output_receptor_error_path = '/n/scratch2/xl198/data/test/receptor_with_prepeocess_error'
-
+ 
 
 def check_ligand():
     for dirname, dirnames, filenames in os.walk(input_path):

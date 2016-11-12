@@ -72,8 +72,8 @@ def count_and_report(input_path,report,counter):
 
 def main():
     count_and_report(config.BASE_YI,
-                     os.path.join(config.REPORT,'atom_count.csv'),
-                     count_atom_num)
+                     os.path.join(config.REPORT,'liangd_count.csv'),
+                     count_liangd_num)
 
 if __name__ == '__main__':
     main()

@@ -1,7 +1,7 @@
 import os, sys
 import config
-import prody
-import subprocess
+#import prody
+#import subprocess
 
 '''
     select ligand which have a rmsd more than 6

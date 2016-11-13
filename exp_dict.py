@@ -4,13 +4,52 @@ import re
 import os,sys
 
 
+def get_id(filename):
+    '''
+    extract the ID of a file
+    :param filename: eg '1a2b_1234.pdb'
+    :return: eg '1a2b_1234'
+    '''
+    ID = '_'.join(filename.split('_')[0:2])
+    return ID
+
+def standarlize_exp( data):
+    '''
+    only first two columns is strng, and the rest are float,
+    and some of the rest would have multiple value, should split them
+    it's hard to convert with operator like gt or lt so we discard them at this time
+    :param data: list of the remark
+    :return: standarlized data
+    '''
+
+    result = []
+    for i in range(len(data)):
+        if i < 2:
+            # they're string so keep it as original
+            result.append(data[i])
+        elif data[i] == '':
+            # Nothing here
+            result.append(None)
+        else:
+
+            m = re.match('\[(.*)\]', data[i])
+            if m:
+                # it was a list
+                nums = m.group(1)
+                nums = nums.split(',')
+                nums = [float(n) for n in nums]
+                result.append(nums)
+            else:
+                nums = data[i].split('|')
+                nums = [float(num) for num in nums if not re.search('>|<', num)]
+                result.append(nums)
+    return result
 
 def read_single_path(input_path):
     for dirname, dirnames, filenames in os.walk(input_path):
         for filename in filenames:
             file_path = os.path.join(dirname, filename)
             return file_path
-
 
 def read_file_path(input_path):
     '''
@@ -72,6 +111,7 @@ def get_remark_data(file_path):
         columns = [ r[0] for r in remark ]
         columns.insert(0,'ID')
         data = [ r[1] for r in remark ]
+        data = standarlize_exp(data)
         data.insert(0,brand)
 
     return data

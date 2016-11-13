@@ -13,9 +13,9 @@ def udf_write_log(filename, string):
 
 input_path = '/n/scratch2/xl198/data/H/data/'
 output_path = '/n/scratch2/xl198/data/test/preprocessed_database/'
-output_error_path = '/n/scratch2/xl198/data/test/ligands_with_preprocess_error'
-output_receptor_path = '/n/scratch2/xl198/data/test/preprocessed_rectprot_database'
-output_receptor_error_path = '/n/scratch2/xl198/data/test/receptor_with_prepeocess_error'
+output_error_path = '/n/scratch2/xl198/data/test/ligands_with_preprocess_error/'
+output_receptor_path = '/n/scratch2/xl198/data/test/preprocessed_rectprot_database/'
+output_receptor_error_path = '/n/scratch2/xl198/data/test/receptor_with_prepeocess_error/'
 
 
 def check_ligand():
@@ -62,9 +62,10 @@ def check_receptor():
     for dirname, dirnames, filenames in os.walk(input_path):
 
         for filename in filenames:
-
-            if not re.search('_ligand.pdb$', filename):
+	    #print filename
+            if not re.search('_ligand.pdb$', filename) and re.search('.pdb$',filename):
                 # if there is not _ligand.pdb
+		#print filename
                 input_ligand_name = filename
                 output_ligand_name = re.sub('.pdb', '_native.pdb', input_ligand_name)
                 ligand_output_folder = output_receptor_path + (dirname.split("/")[-1])

@@ -1,6 +1,7 @@
 import os, sys , getopt
 import config
 import time
+import pandas as pd
 
 def get_job_num():
     # get how many job are there running on Orchestra
@@ -25,7 +26,7 @@ def create_jobarray(base):
         job.write('export OMP_NUM_THREADS=1\n')
         job.write('export LC_ALL="en_US.UTF-8"\n')
         job.write('source /home/xl198/venv/data/bin/activate\n')
-        job.write('python %s %s ${LSB_JOBINDEX} \n'%(config.CONVERT, base))
+        job.write('python %s %s ${LSB_JOBINDEX} \n'%(os.path.join(config._BASE_SCRIPT,'run_obabel.py'), base))
 
 
     return Jobarray
@@ -51,10 +52,14 @@ def get_job_num_new_line_inserter():
     input_path = config.BASE_YI
     return len(os.listdir(input_path))
 
+def get_csv_size():
+    df = pd.read_csv('/n/scratch2/xl198/data/remark/qualify.csv')
+    return len(df)
+
 def check_loop():
 
 
-    total = get_job_num_get_split()
+    total = get_csv_size()
 
     sys.stderr.write("\nConvert mol2 into pdb\n")
     sys.stderr.write("total commands num : %s\n"%total)

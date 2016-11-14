@@ -29,9 +29,9 @@ def get_pdb_and_crystal(input_file):
         os.mkdir(crystal_path)
 
     crystal_out = os.path.join(crystal_path,filename+'.pdb')
-
-    cmd = 'obabel -ipdb %s -opdb -O %s -d'%(crystal_in,crystal_out)
-    os.system(cmd)
+    if not os.path.exists(crystal_out):
+        cmd = 'obabel -ipdb %s -opdb -O %s -d'%(crystal_in,crystal_out)
+        os.system(cmd)
 
 def convert(item):
     PDB =item['PDBname']
@@ -39,33 +39,33 @@ def convert(item):
     RES,Id = RS.split('_')
 
     source_base = '/n/scratch2/xl198/data/result'
-    source_file_path= os.path.join(source_base,PDB,'_'.join(PDB,RES,'ligand','fast.mol'))
+    source_file_path= os.path.join(source_base,PDB,'_'.join([PDB,RES,'ligand','fast.mol']))
 
     dest_base = '/n/scratch2/xl198/data/filter_rmsd/ligands'
     dest_path = os.path.join(dest_base,PDB)
     if not os.path.exists(dest_path):
         os.mkdir(dest_path)
-    dest_file_path = os.path.join(dest_path,'_'.join(PDB,RES,'ligand','fast',Id+'.pdb'))
+    dest_file_path = os.path.join(dest_path,'_'.join([PDB,RES,'ligand','fast',Id+'.pdb']))
 
     cmd = 'obabel -imol2 %s -f %s -l %s -opdb -O %s '%(source_file_path,Id,Id,dest_file_path)
 
     os.system(cmd)
 
 def run(base, offset):
-    df = pd.read_csv('/n/scratch2/xl198/data/remark/filter.csv')
+    df = pd.read_csv('/n/scratch2/xl198/data/remark/filter_rmsf_gt_6.csv')
     convert(df.ix[base*1000+offset-1])
-
+    get_pdb_and_crystal(df.ix[base*1000+offset-1]['ID'])
 
 def test():
     base=0
     offset = 1
-    df = pd.read_csv('/n/scratch2/xl198/data/remark/filter.csv')
+    df = pd.read_csv('/n/scratch2/xl198/data/remark/qualify.csv')
     convert(df.ix[base * 1000 + offset - 1])
 
 def get():
-    df = pd.read_csv('/n/scratch2/xl198/data/remark/avail.csv')
-    for d in df:
-        get_pdb_and_crystal(d['ID'])
+    df = pd.read_csv('/n/scratch2/xl198/data/remark/valid.csv')
+    for i in range(len(df)):
+        get_pdb_and_crystal(df.ix[i]['ID'])
 
 def main():
     args = sys.argv
@@ -76,4 +76,4 @@ def main():
         run(base, offset)
 
 if __name__ == '__main__':
-    get()
+    main()

@@ -50,12 +50,14 @@ def standarlize_exp(data):
 
 def standarlize_dock(data):
     result = []
-    for i in range(data):
+    for i in range(len(data)):
         if i == 0:
             result.append(data[i])
         elif i == 1:
             result.append(data[i])
-            result.append(int(data[i].sptli('_')[1]))
+            result.append(int(data[i].split('_')[1]))
+	elif data[i] == 'NA':
+	    result.append('')
         else:
 
             m = re.match('\[(.*)\]', data[i])
@@ -66,6 +68,7 @@ def standarlize_dock(data):
                 nums = [float(n) for n in nums]
                 result.append(nums)
             else:
+		
                 result.append(float(data[i]))
     return result
 
@@ -205,6 +208,7 @@ def get_dock_remark_data(file_path):
         remark = [r.split(':') for r in remark]
         datum = [r[1] for r in remark]
         result = standarlize_dock(datum)
+	result.insert(0,brand)
         data.append(result)
 
     return data

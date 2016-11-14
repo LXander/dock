@@ -24,7 +24,7 @@ def standarlize_exp( data):
 
     result = []
     for i in range(len(data)):
-        if i < 2:
+        if i < 2 or i == 9:
             # they're string so keep it as original
             result.append(data[i])
         elif data[i] == '':
@@ -40,8 +40,10 @@ def standarlize_exp( data):
                 nums = [float(n) for n in nums]
                 result.append(nums)
             else:
+		print i
+		print data[i]
                 nums = data[i].split('|')
-                nums = [float(num) for num in nums if not re.search('>|<', num)]
+                nums = [float(num) for num in nums if not re.search('>|<|NA', num)]
                 result.append(nums)
     return result
 

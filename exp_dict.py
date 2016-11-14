@@ -13,7 +13,6 @@ def get_id(filename):
     ID = '_'.join(filename.split('_')[0:2])
     return ID
 
-
 def standarlize_exp(data):
     '''
     only first two columns is strng, and the rest are float,
@@ -72,13 +71,11 @@ def standarlize_dock(data):
                 result.append(float(data[i]))
     return result
 
-
 def read_single_path(input_path):
     for dirname, dirnames, filenames in os.walk(input_path):
         for filename in filenames:
             file_path = os.path.join(dirname, filename)
             return file_path
-
 
 def read_file_path(input_path):
     '''
@@ -91,7 +88,6 @@ def read_file_path(input_path):
         for filename in filenames:
             file_path = os.path.join(dirname, filename)
             yield file_path
-
 
 def get_remark_columns(file_path):
     '''
@@ -117,7 +113,6 @@ def get_remark_columns(file_path):
         columns.insert(0, 'ID')
 
     return columns
-
 
 def get_remark_data(file_path):
     '''

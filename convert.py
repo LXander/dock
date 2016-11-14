@@ -106,7 +106,7 @@ class convert:
 
         result = []
         for i in range(len(data)):
-            if i <2:
+            if i <2 or i == 9:
                 # they're string so keep it as original
                 result.append(data[i])
             elif data[i] == '':
@@ -123,7 +123,7 @@ class convert:
                     result.append(nums)
                 else:
                     nums = data[i].split('|')
-                    nums = [ float(num) for num in nums if not re.search('>|<',num)]
+                    nums = [ float(num) for num in nums if not re.search('>|< |NA', num)]
                     result.append(nums)
 
         return result

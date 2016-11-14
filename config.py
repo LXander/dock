@@ -54,3 +54,5 @@ BASE_DATA = '/n/scratch2/xl198/data'
 
 # REPORT is the folder to save the result
 REPORT = '/home/xl198/report'
+
+AVAIL = '/n/scratch2/xl198/data/remark/avail.csv'

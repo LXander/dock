@@ -2,6 +2,7 @@ import os, sys
 import config
 import re
 import shutil
+import util
 
 '''
     This file is used to get seperated pdb file from Yi's folder
@@ -127,7 +128,13 @@ def get_pdb_and_crystal(input_file):
     cmd = 'obabel -ipdb %s -opdb -O %s -d'%(crystal_in,crystal_out)
     os.system(cmd)
 
-
+def check_avail(file_path):
+    ID = util.get_id(os.path.basename(file_path))
+    avail_list = []
+    with open(config.AVAIL) as fr:
+        for line in fr:
+            avail_list.append(line.strip('\n'))
+    return ID in avail_list
 
 
 def run(base, offset):
@@ -147,11 +154,14 @@ def run(base, offset):
 
     # print 'file_path '+file_path
 
+
     if file_path and re.search('.mol$', file_path):
-        # get the mol file we need
-        print "get"
-        convert(file_path)
-        get_pdb_and_crystal(file_path)
+        flag = check_avail(file_path)
+        if flag:
+            # get the mol file we need
+            print "get"
+            convert(file_path)
+            get_pdb_and_crystal(file_path)
 
 
 def main():

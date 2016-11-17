@@ -53,7 +53,7 @@ def get_job_num_new_line_inserter():
     return len(os.listdir(input_path))
 
 def get_csv_size():
-    df = pd.read_csv('/n/scratch2/xl198/data/remark/qualify.csv')
+    df = pd.read_csv('/n/scratch2/xl198/data/remark/filter_rmsf_gt_6.csv')
     return len(df)
 
 def check_loop():

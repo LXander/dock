@@ -26,7 +26,7 @@ def create_jobarray(base):
         job.write('export OMP_NUM_THREADS=1\n')
         job.write('export LC_ALL="en_US.UTF-8"\n')
         job.write('source /home/xl198/venv/data/bin/activate\n')
-        job.write('python %s %s ${LSB_JOBINDEX} \n'%(os.path.join(config._BASE_SCRIPT,'run_obabel.py'), base))
+        job.write('python %s %s ${LSB_JOBINDEX} \n'%(os.path.join(config._BASE_SCRIPT,'multi_frame_checker.py'), base))
 
 
     return Jobarray
@@ -56,10 +56,19 @@ def get_csv_size():
     df = pd.read_csv('/n/scratch2/xl198/data/remark/filter_rmsf_gt_6.csv')
     return len(df)
 
+def get_in_folder():
+    input_path = '/n/scratch2/xl198/data/H/data'
+    count = 0
+
+    for dirname, dirnames, filenames in os.walk(input_path):
+        count += len(filenames)
+
+    return count
+
 def check_loop():
 
 
-    total = get_csv_size()
+    total = get_in_folder()
 
     sys.stderr.write("\nConvert mol2 into pdb\n")
     sys.stderr.write("total commands num : %s\n"%total)

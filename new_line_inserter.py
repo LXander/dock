@@ -59,7 +59,7 @@ def run_convert(base,offset):
     index = base*1000+offset
   
     if len(files)>index:
-	run(os.path.join(base_path,files[index]))
+        run(os.path.join(base_path,files[index]))
         convert(os.path.join(base_path,files[index]))
         
         

@@ -15,7 +15,7 @@ def check(file_path):
         str(commands.getstatusoutut("cp " + file_path + " " + output_path))
         print std_out
     else:
-	print "success %s"%(file_path)
+	print "cp " + file_path + " " + output_path
 
 def run(base, offset):
     input_path = '/n/scratch2/xl198/data/H/data'

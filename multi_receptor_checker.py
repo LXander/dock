@@ -56,8 +56,6 @@ def check_ligand():
                     udf_write_log(error_folder + "/" + re.sub('\.pdb$', '', output_ligand_name) + ".log", std_out)
 
 
-
-
 def check_receptor():
     for dirname, dirnames, filenames in os.walk(input_path):
 
@@ -96,5 +94,3 @@ def check_receptor():
                     # finally, write a log file
                     udf_write_log(error_folder + "/" + re.sub('\.pdb$', '', output_ligand_name) + ".log", std_out)
 
-
-check_receptor()

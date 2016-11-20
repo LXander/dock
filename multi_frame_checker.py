@@ -12,9 +12,10 @@ def check(file_path):
     system_convert_ligand = 'obabel -i pdb %s -h -o pdb -O %s' % (file_path, os.path.join('/tmp/', filename))
     std_out = str(commands.getstatusoutput(system_convert_ligand))
     if not std_out == "(0, \'1 molecule converted\')":
-        str(commands.getstatusoutut("cp " + os.path.join('/tmp/', filename) + " " + output_path))
+        str(commands.getstatusoutut("cp " + file_path + " " + output_path))
         print std_out
-
+    else:
+	print "success %s"%(file_path)
 
 def run(base, offset):
     input_path = '/n/scratch2/xl198/data/H/data'

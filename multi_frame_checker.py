@@ -12,10 +12,14 @@ def check(file_path):
     system_convert_ligand = 'obabel -i pdb %s -h -o pdb -O %s' % (file_path, os.path.join('/tmp/', filename))
     std_out = str(commands.getstatusoutput(system_convert_ligand))
     if not std_out == "(0, \'1 molecule converted\')":
-        str(commands.getstatusoutut("cp " + file_path + " " + output_path))
+        commands.getstatusoutput("cp " + file_path + " " + output_path)
         print std_out
+	#with open(os.path.join('/home/xl198/code/bucket',filename+'.txt'),'w') as fr:
+	#	fr.write(std_out)
+		
     else:
 	print "cp " + file_path + " " + output_path
+	print std_out
 
 def run(base, offset):
     input_path = '/n/scratch2/xl198/data/H/data'

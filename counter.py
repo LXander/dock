@@ -27,7 +27,7 @@ def count_atom_num(input_file):
     count the number of atoms for given ligand in mol2 foramt.
 
     :param input_file: path of input file eg. '/n/scratch2/xl198/data/source/ligands/1a2b/1a2b_1234_liagnd.mol2'
-    :return: [filename,atom_num] eg [1a2b_1234_liagnd,10]
+    :return: [ID,atom_num] eg [1a2b_1234,10]
     '''
 
 
@@ -43,9 +43,11 @@ def count_atom_num(input_file):
                 break
             elif flag:
                 atom_num += 1
+	
+    name = os.path.basename(input_file)
+    ID = '_'.join(name.split('_')[:2])
 
-
-    return [os.path.basename(input_file),atom_num]
+    return [ID,atom_num]
 
 
 
@@ -72,8 +74,8 @@ def count_and_report(input_path,report,counter):
 
 def main():
     count_and_report(config.BASE_YI,
-                     os.path.join(config.REPORT,'liangd_count.csv'),
-                     count_liangd_num)
+                     os.path.join(config.REPORT,'atom_count.csv'),
+                     count_atom_num)
 
 if __name__ == '__main__':
     main()

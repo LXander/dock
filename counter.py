@@ -4,6 +4,11 @@ import os,sys
 import numpy as np
 import pandas as pd
 
+'''
+Counter the number of ligands in a file
+or counter the number of the atoms in a ligand
+'''
+
 def count_liangd_num(input_file):
     '''
     count the number of ligands for given ligands in mol2 foramt.

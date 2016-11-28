@@ -3,7 +3,10 @@ import pandas as pd
 import re
 import os, sys
 
+'''
+This is to used formalize the remard in experience data.
 
+'''
 def get_id(filename):
     '''
     extract the ID of a file

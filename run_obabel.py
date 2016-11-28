@@ -4,6 +4,15 @@ import config
 import os,sys
 import shutil
 
+'''
+In our current database docking result stored in one file
+This code used obabel to convert specific ligand from file
+and store them orderly in given path
+The souce is a csv file contain columns ['PDBname','PDBResId']
+'''
+
+source_csv = ''
+
 def get_pdb_and_crystal(input_file):
     # source to place crystal ligand
     crystal_source = os.path.join(config.BASE_DATA, 'H', 'addH')

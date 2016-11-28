@@ -5,6 +5,17 @@ import config
 import util
 import time
 
+
+'''
+Orchestra allow submit jobarray, so we can submit at most 1000 similar jobs
+at a time and use jobid to distinguish them.
+
+1000 is far less than the total number of jobs(maybe 1m),
+so we use offset*1000+base to identifier the job.
+
+
+'''
+
 def docking(script_index,index_offset,index,debug_flag):
     script_file = config.COMMANDS_FILE[script_index]
     script_file = util.path_check(script_file)

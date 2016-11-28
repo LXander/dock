@@ -3,6 +3,14 @@ import config
 import time
 import pandas as pd
 
+'''
+This code is used to monitor the job on Orchestra
+
+1. Calculate the total number of job
+2. Check the number of current job is less than 500 then submit new job
+3. To submit job : create a bash file to submit jobarray
+'''
+
 def get_job_num():
     # get how many job are there running on Orchestra
     r = os.popen('bjobs | wc -l')

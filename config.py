@@ -1,5 +1,10 @@
 import os,sys
 
+'''
+Ususally I put all the path in this file
+but sometime is't not so convenitent...
+'''
+
 #smina's path
 SMINA = '/home/xl198/dock/Orchestra/dataJob/smina.static'
 

@@ -61,17 +61,23 @@ def convert(item):
     os.system(cmd)
 
 def run(base, offset):
-    df = pd.read_csv('/n/scratch2/xl198/data/remark/filter_rmsf_gt_6.csv')
+    df = pd.read_csv('/home/xl198/remark/after_atom.csv')
     convert(df.ix[base*1000+offset-1])
     get_pdb_and_crystal(df.ix[base*1000+offset-1]['ID'])
 
 def test():
+    '''
+    extract docked ligand from a given file
+    '''
     base=0
     offset = 1
     df = pd.read_csv('/n/scratch2/xl198/data/remark/qualify.csv')
     convert(df.ix[base * 1000 + offset - 1])
 
 def get():
+    '''
+    get crystal ligand and receptor 
+    '''
     df = pd.read_csv('/n/scratch2/xl198/data/remark/valid.csv')
     for i in range(len(df)):
         get_pdb_and_crystal(df.ix[i]['ID'])

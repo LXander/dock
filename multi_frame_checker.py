@@ -1,5 +1,5 @@
 import config
-import os,sys
+import os, sys
 import re
 import commands
 
@@ -14,12 +14,25 @@ def check(file_path):
     if not std_out == "(0, \'1 molecule converted\')":
         commands.getstatusoutput("cp " + file_path + " " + output_path)
         print std_out
-	#with open(os.path.join('/home/xl198/code/bucket',filename+'.txt'),'w') as fr:
-	#	fr.write(std_out)
-		
+        # with open(os.path.join('/home/xl198/code/bucket',filename+'.txt'),'w') as fr:
+    #	fr.write(std_out)
+
     else:
-	print "cp " + file_path + " " + output_path
-	print std_out
+        print "cp " + file_path + " " + output_path
+        print std_out
+
+
+def run_receptor(base, offset):
+    # check if receptor contain multiple frame
+    input_path = '/n/scratch2/xl198/data/H/data'
+
+    folder = os.listdir(input_path)
+
+    receptor = folder[ base*1000 + offset - 1 ]
+
+    file_path = os.path.join(input_path,receptor,receptor+'.pdb')
+
+    check(file_path)
 
 def run(base, offset):
     input_path = '/n/scratch2/xl198/data/H/data'
@@ -43,13 +56,14 @@ def run(base, offset):
     if file_path:
         check(file_path)
 
+
 def main():
     args = sys.argv
     base = int(args[1])
     offset = int(args[2])
 
-    run(base, offset)
-    #sys.stderr.write("run convert %s" % (base * 1000 + offset))
+    run_receptor(base, offset)
+    # sys.stderr.write("run convert %s" % (base * 1000 + offset))
     '''
     if len(args)<2:
         num = None

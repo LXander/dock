@@ -2,6 +2,7 @@ import os, sys , getopt
 import config
 import time
 import pandas as pd
+from itertools import chain
 
 '''
 This code is used to monitor the job on Orchestra
@@ -69,6 +70,17 @@ def get_in_folder():
     count = 0
 
     for dirname, dirnames, filenames in os.walk(input_path):
+        count += len(filenames)
+
+    return count
+
+def get_database_size():
+    count  = 0
+    database_path = ''
+    source_ligands_folder = os.path.join(database_path, 'ligands')
+    source_crystal_folder = os.path.join(database_path, 'crystal')
+    source_receptor_folder = os.path.join(database_path, 'receptor')
+    for dirpath,dirname,filenames in chain(os.walk(source_crystal_folder),os.walk(source_ligands_folder),os.walk(source_receptor_folder)):
         count += len(filenames)
 
     return count

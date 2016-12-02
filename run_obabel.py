@@ -61,7 +61,7 @@ def convert(item):
     os.system(cmd)
 
 def run(base, offset):
-    df = pd.read_csv('/home/xl198/remark/after_atom.csv')
+    df = pd.read_csv('/home/xl198/remark/nov30.csv')
     convert(df.ix[base*1000+offset-1])
     get_pdb_and_crystal(df.ix[base*1000+offset-1]['ID'])
 

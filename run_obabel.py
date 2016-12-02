@@ -55,7 +55,7 @@ def convert(item):
     source_file_path= os.path.join(source_base,PDB,'_'.join([PDB,RES,'ligand','fast.mol']))
 
     dest_base = '/n/scratch2/xl198/data/filter_rmsd/docked_ligands'
-    if not os.exists(dest_base):
+    if not os.path.exists(dest_base):
         os.mkdir(dest_base)
     dest_path = os.path.join(dest_base,PDB)
     if not os.path.exists(dest_path):

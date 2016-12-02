@@ -81,7 +81,7 @@ def check_loop():
     sys.stderr.write("\nConvert mol2 into pdb\n")
     sys.stderr.write("total commands num : %s\n"%total)
     cur = 0
-    base = 260
+    base = 430
     i = 1 
     #base = offset + 1000 if offset + 1000 <= docking_num else docking_num
     while(1):

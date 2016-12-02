@@ -61,7 +61,7 @@ def get_job_num_new_line_inserter():
     return len(os.listdir(input_path))
 
 def get_csv_size():
-    df = pd.read_csv('/home/xl198/remark/nov30.csv')
+    df = pd.read_csv('/home/xl198/remark/dec_1.csv')
     return len(df)
 
 def get_in_folder():

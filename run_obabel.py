@@ -17,12 +17,16 @@ def get_pdb_and_crystal(input_file):
     # source to place crystal ligand
     crystal_source = os.path.join(config.BASE_DATA, 'H', 'addH')
     # dest to place converted ligand
-    crystal_dest = os.path.join(config.BASE_DATA, 'filter_rmsd', 'crystal')
+    crystal_dest = os.path.join(config.BASE_DATA, 'filter_rmsd', 'crystal_ligands')
+    if not os.path.exists(crystal_dest):
+        os.mkdir(crystal_dest)
 
     # source to place pdb
     pdb_source = os.path.join(config.BASE_DATA, 'H', 'data')
     # dest to place pdb
-    pdb_dest = os.path.join(config.BASE_DATA, 'filter_rmsd', 'receptor')
+    pdb_dest = os.path.join(config.BASE_DATA, 'filter_rmsd', 'receptors')
+    if not os.path.exists(pdb_dest):
+        os.mkdir(pdb_dest)
 
     #dirname = os.path.dirname(input_file)
     #receptor = os.path.basename(dirname)
@@ -50,7 +54,9 @@ def convert(item):
     source_base = '/n/scratch2/xl198/data/result'
     source_file_path= os.path.join(source_base,PDB,'_'.join([PDB,RES,'ligand','fast.mol']))
 
-    dest_base = '/n/scratch2/xl198/data/filter_rmsd/ligands'
+    dest_base = '/n/scratch2/xl198/data/filter_rmsd/docked_ligands'
+    if not os.exists(dest_base):
+        os.mkdir(dest_base)
     dest_path = os.path.join(dest_base,PDB)
     if not os.path.exists(dest_path):
         os.mkdir(dest_path)
@@ -61,7 +67,7 @@ def convert(item):
     os.system(cmd)
 
 def run(base, offset):
-    df = pd.read_csv('/home/xl198/remark/nov30.csv')
+    df = pd.read_csv('/home/xl198/remark/dec_1.csv')
     convert(df.ix[base*1000+offset-1])
     get_pdb_and_crystal(df.ix[base*1000+offset-1]['ID'])
 

@@ -24,7 +24,7 @@ def create_jobarray(base):
     with open(Jobarray,'w') as job:
         job.write('#!/bin/bash\n')
         job.write('#BSUB -n 1                #each  job run on 1 core\n')
-        job.write('#BSUB -W 10            #job run 12 hour\n')
+        job.write('#BSUB -W 240:00            #job run 12 hour\n')
         job.write('#BSUB -J jobArray[1-1000] #job array list goes begin,begin+1,begin+2...end\n')
         job.write('#BSUB -o /dev/null        #lsf output file\n')
         job.write('#BSUB -e /dev/null       #lsf error file\n')

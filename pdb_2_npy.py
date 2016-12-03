@@ -12,8 +12,8 @@ Convert pdb data into npy
 
 '''
 
-database_path = ''
-destination_path = ''
+database_path = '/home/mdk24/database/filter_rmsd'
+destination_path = '/n/scratch2/xl198/data/npy'
 
 def get_pdb_and_crystal(input_file):
     # source to place crystal ligand
@@ -111,16 +111,14 @@ def run(base, offset):
 
     cur = base*1000+offset-1
     for dirpath,dirname,filenames in chain(os.walk(source_ligands_folder),os.walk(source_crystal_folder)):
-        if cur<len(filenames):
-            convert_ligand(os.path.join(dirpath,filenames[cur]))
-        else:
-            cur -= len(filenames)
+        for f in filenames: 
+            convert_ligand(os.path.join(dirpath,f))
+       
 
     for dirpath,dirname,filenames in os.walk(source_receptor_folder):
-        if cur<len(filenames):
-            convert_receptor(os.path.join(dirpath,filenames[cur]))
-        else:
-            cur -= len(filenames)
+        for f in filenames:
+            convert_receptor(os.path.join(dirpath,f))
+       
 
 
 def test():

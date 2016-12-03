@@ -26,6 +26,35 @@ def create_folder(folder):
     if not os.path.exists(folder):
         os.mkdir(folder)
 
+
+def copy_original_pdb(source, dest, raw):
+    append_dest = lambda x: os.path.join(dest, x)
+    folders = map(append_dest, database_folders)
+    map(create_folder, folders)
+
+    files = raw['path']
+    files = []
+    for f in files:
+        create_folder(os.path.dirname(os.path.join(dest, f)))
+        shutil.copy(os.path.join(source, f), os.path.join(dest, f))
+
+    crystal = raw.apply(lambda item: crystal_folder_name + '/' + item['PDBname'] + '/' + item['ID'] + '_ligand.pdb',
+                        axis=1)
+
+    crystal = list(set(crystal))
+
+    for rec in crystal:
+        create_folder(os.path.dirname(os.path.join(dest, rec)))
+        shutil.copy(os.path.join(source, rec), os.path.join(dest, rec))
+
+    receptor = raw.apply(lambda item: receptor_folder_name + '/' + item['PDBname'] + '.pdb', axis=1)
+    receptor = list(set(receptor))
+
+    for rec in receptor:
+        create_folder(os.path.join(dest, 'receptor'))
+        shutil.copy(os.path.join(source, rec), os.path.join(dest, rec))
+
+
 def copy_original(source,dest,raw):
     append_dest = lambda x:os.path.join(dest,x)
     folders =map(append_dest,database_folders)
@@ -58,12 +87,18 @@ def _copy(item,source = '/n/scratch2/xl198/data/npy',dest='/n/scratch2/xl198/dat
     print os.path.join(source,item['file']) 
     shutil.copy(os.path.join(source, item['file']),os.path.join(dest,'receptor' if item['code'][0]=='P' else 'ligands',item['code']+".npy"))
 
-def copy_coded(source,dest,lookup):
+def _copy_pdb(item,source = '/home/mdk24/database/filter_rmsd',dest='/n/scratch2/xl198/data/test_set'):
+    print os.path.join(source,item['file'])
+    shutil.copy(os.path.join(source, item['file']),os.path.join(dest,'receptor' if item['code'][0]=='P' else 'ligands',item['code']+".pdb"))
+
+
+
+def copy_coded(source,dest,lookup,copy_function):
     append_dest = lambda x: os.path.join(dest, x)
     folders = map(append_dest, ['receptor','ligands'])
     map(create_folder, folders)
 
-    lookup.apply(_copy,axis=1)
+    lookup.apply(copy_function,axis=1)
 
 def generate_database_index(database_path):
     crystal_folder = os.path.join(database_path,'crystal')

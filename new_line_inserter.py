@@ -6,7 +6,7 @@ import time
 '''
     This file is used to get the result form Yi
     and then organized them into folder
-    and insert newline into it or it can't be read into obabel
+    and insert newline into it otherwise it can't be read into obabel
 
 '''
 

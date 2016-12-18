@@ -48,11 +48,9 @@ def get_pdb_and_crystal(input_file):
         cmd = 'obabel -ipdb %s -opdb -O %s -d'%(crystal_in,crystal_out)
         os.system(cmd)
 
-
 def ligand_atom_to_number(atomname):
     atomic_tag_number = atom_dictionary.LIG[atomname.lower()]
     return atomic_tag_number
-
 
 def receptor_atom_to_number(atomname):
     atomic_tag_number = atom_dictionary.REC[atomname.lower()]
@@ -118,8 +116,6 @@ def run(base, offset):
     for dirpath,dirname,filenames in os.walk(source_receptor_folder):
         for f in filenames:
             convert_receptor(os.path.join(dirpath,f))
-       
-
 
 def test():
     '''

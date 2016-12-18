@@ -11,7 +11,6 @@ and store them orderly in given path
 The souce is a csv file contain columns ['PDBname','PDBResId']
 '''
 
-source_csv = ''
 
 def get_pdb_and_crystal(input_file):
     # source to place crystal ligand

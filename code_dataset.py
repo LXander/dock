@@ -92,8 +92,6 @@ def _copy(item, source, dest):
                 os.path.join(dest, item['dest']))
 
 
-
-
 def copy_coded(source, dest, copy_tabel):
     '''
     copy coded file from source to dest

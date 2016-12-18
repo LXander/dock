@@ -11,19 +11,21 @@ and store them orderly in given path
 The souce is a csv file contain columns ['PDBname','PDBResId']
 '''
 
+source_csv = ''
 
 def get_pdb_and_crystal(input_file):
+    print 'get',input_file
     # source to place crystal ligand
     crystal_source = os.path.join(config.BASE_DATA, 'H', 'addH')
     # dest to place converted ligand
-    crystal_dest = os.path.join(config.BASE_DATA, 'dec_17', 'crystal_ligands')
+    crystal_dest = os.path.join(config.BASE_DATA, 'filter_rmsd', 'crystal_ligands')
     if not os.path.exists(crystal_dest):
         os.mkdir(crystal_dest)
 
     # source to place pdb
     pdb_source = os.path.join(config.BASE_DATA, 'H', 'data')
     # dest to place pdb
-    pdb_dest = os.path.join(config.BASE_DATA, 'dec_17', 'receptors')
+    pdb_dest = os.path.join(config.BASE_DATA, 'filter_rmsd', 'receptors')
     if not os.path.exists(pdb_dest):
         os.mkdir(pdb_dest)
 
@@ -53,7 +55,7 @@ def convert(item):
     source_base = '/n/scratch2/xl198/data/result'
     source_file_path= os.path.join(source_base,PDB,'_'.join([PDB,RES,'ligand','fast.mol']))
 
-    dest_base = '/n/scratch2/xl198/data/dec_17/docked_ligands'
+    dest_base = '/n/scratch2/xl198/data/filter_rmsd/docked_ligands'
     if not os.path.exists(dest_base):
         os.mkdir(dest_base)
     dest_path = os.path.join(dest_base,PDB)
@@ -66,13 +68,10 @@ def convert(item):
     os.system(cmd)
 
 def run(base, offset):
-    df = pd.read_csv('/home/xl198/remark/dec_17_small.csv')
-    print 'num',len(df)
-    total = int(len(df)*1.0/1000)+1
-    print 'total',total
-    for i in range(total):
-    	convert(df.ix[base*1000+(offset-1)*total+i])
-        get_pdb_and_crystal(df.ix[base*1000+(offset-1)*total+i]['ID'])
+    df = pd.read_csv('/home/xl198/remark/dec_04.csv')
+    for i in range(1000):
+    	convert(df.ix[base*1000+offset-1+i])
+        get_pdb_and_crystal(df.ix[base*1000+offset-1+i]['ID'])
 
 def test():
     '''
@@ -81,15 +80,23 @@ def test():
     base=0
     offset = 1
     df = pd.read_csv('/n/scratch2/xl198/data/remark/qualify.csv')
+    
     convert(df.ix[base * 1000 + offset - 1])
 
-def get():
+def get(base,offset):
     '''
     get crystal ligand and receptor 
     '''
-    df = pd.read_csv('/n/scratch2/xl198/data/remark/valid.csv')
-    for i in range(len(df)):
-        get_pdb_and_crystal(df.ix[i]['ID'])
+    df = pd.read_csv('/home/xl198/remark/dec_04.csv')
+    gou = df.groupby("ID")
+    groups = gou.groups
+    index = [ groups[key][0] for key in groups.keys()]
+	
+    
+    
+    for i in range(len(index)):
+	if i%10 == offset:
+            get_pdb_and_crystal(df.ix[index[i]]['ID'])
 
 def main():
     args = sys.argv
@@ -97,7 +104,7 @@ def main():
         base = int(args[1])
         offset = int(args[2])
         print 'base %d offset %d' % (base, offset)
-        run(base, offset)
+        get(base, offset)
 
 if __name__ == '__main__':
     main()

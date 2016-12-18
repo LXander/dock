@@ -23,11 +23,18 @@ def make_index():
 
     one_file = np.vstack(npy_list)
 
-    one_file.tofile(os.path.join(dest_folder,'result'))
+    one_file.tofile(os.path.join(dest_folder,'result.npy'))
     start = np.array(offset[:-1])
     start = np.cumsum(start)
     end = start + np.array(offset[1:])
-    record = pd.DataFrame(data = [ids,start,end],columns=['ID','start','end'])
+    
+    start = list(start)
+    end = list(end)
+    data = []
+    for i in range(len(ids)):
+	data.append([ids[i],start[i],end[i]])
+
+    record = pd.DataFrame(data=data,columns=['ID','start','end'])
     record.to_csv(os.path.join(dest_folder,'record.csv'),index=False)
 
 

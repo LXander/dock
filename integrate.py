@@ -14,7 +14,7 @@ def make_index():
     offset = [0]
     for dirpath,dirnames,filenames in chain(os.walk(os.path.join(source_path,'receptors'))):
         for filename in filenames:
-            npy = np.load(os.path.join(dirpath,filename))
+            npy = np.reshape(np.load(os.path.join(dirpath,filename)),(-1,4))
             #ids.append('_'.join(filename.split('.')[0].split('_')[:3]))
             ids.append(filename.split('.')[0])
             offset.append(npy.shape[0])
@@ -23,7 +23,7 @@ def make_index():
 
     one_file = np.vstack(npy_list)
 
-    one_file.tofile(os.path.join(dest_folder,'result.npy'))
+    np.save(os.path.join(dest_folder,'result.npy'),one_file)
     start = np.array(offset[:-1])
     start = np.cumsum(start)
     end = start + np.array(offset[1:])

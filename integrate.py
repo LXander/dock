@@ -5,6 +5,19 @@ import pandas as pd
 
 dest_folder = '/n/scratch2/xl198/data/integrate'
 source_path = '/n/scratch2/xl198/data/kaggle_dec_04/test_set_npy'
+test_file ='/n/scratch2/xl198/data/integrate/result.npy'
+
+
+def test(i):
+    look = pd.read_csv(os.path.join(dest_folder,'record.csv'))
+    npy = np.load(test_file)
+    idx = look.ix[i]['ID']
+    path = os.path.join(source_path,'receptors', idx + '.npy')
+    start = look.ix[i]['start']
+    end = look.ix[i]['end']
+    a = npy[start:end]
+    b = np.load(path)
+    print np.all(a == b)
 
 def make_index():
     if not os.path.exists(dest_folder):

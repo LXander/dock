@@ -17,14 +17,14 @@ def get_pdb_and_crystal(input_file):
     # source to place crystal ligand
     crystal_source = os.path.join(config.BASE_DATA, 'H', 'addH')
     # dest to place converted ligand
-    crystal_dest = os.path.join(config.BASE_DATA, 'dec_17', 'crystal_ligands')
+    crystal_dest = os.path.join(config.BASE_DATA, 'bigger', 'crystal_ligands')
     if not os.path.exists(crystal_dest):
         os.mkdir(crystal_dest)
 
     # source to place pdb
     pdb_source = os.path.join(config.BASE_DATA, 'H', 'data')
     # dest to place pdb
-    pdb_dest = os.path.join(config.BASE_DATA, 'dec_17', 'receptors')
+    pdb_dest = os.path.join(config.BASE_DATA, 'bigger', 'receptors')
     if not os.path.exists(pdb_dest):
         os.mkdir(pdb_dest)
 
@@ -32,9 +32,11 @@ def get_pdb_and_crystal(input_file):
     #receptor = os.path.basename(dirname)
     receptor = input_file.split('_')[0]
     filename = input_file+'_ligand'
-
+    
     receptor_in = os.path.join(pdb_source,receptor,receptor+'.pdb')
-    shutil.copy(receptor_in,pdb_dest)
+    if not os.path.exists(pdb_dest):
+        sys.stderr.write( "pdb 1")
+        shutil.copy(receptor_in,pdb_dest)
 
     crystal_in = os.path.join(crystal_source,receptor,filename+'.pdb')
     crystal_path = os.path.join(crystal_dest,receptor)
@@ -43,6 +45,7 @@ def get_pdb_and_crystal(input_file):
 
     crystal_out = os.path.join(crystal_path,filename+'.pdb')
     if not os.path.exists(crystal_out):
+        sys.stderr.write("crystal 1")
         cmd = 'obabel -ipdb %s -opdb -O %s -d'%(crystal_in,crystal_out)
         os.system(cmd)
 
@@ -54,24 +57,27 @@ def convert(item):
     source_base = '/n/scratch2/xl198/data/result'
     source_file_path= os.path.join(source_base,PDB,'_'.join([PDB,RES,'ligand','fast.mol']))
 
-    dest_base = '/n/scratch2/xl198/data/dec_17/docked_ligands'
+    dest_base = '/n/scratch2/xl198/data/bigger/docked_ligands'
     if not os.path.exists(dest_base):
         os.mkdir(dest_base)
     dest_path = os.path.join(dest_base,PDB)
     if not os.path.exists(dest_path):
         os.mkdir(dest_path)
     dest_file_path = os.path.join(dest_path,'_'.join([PDB,RES,'ligand','fast',Id+'.pdb']))
+    if not os.path.exists(dest_file_path):
+        sys.stderr.write("convert 1")
+        cmd = 'obabel -imol2 %s -f %s -l %s -opdb -O %s '%(source_file_path,Id,Id,dest_file_path)
 
-    cmd = 'obabel -imol2 %s -f %s -l %s -opdb -O %s '%(source_file_path,Id,Id,dest_file_path)
-
-    os.system(cmd)
+        os.system(cmd)
 
 def run(base, offset):
-    df = pd.read_csv('/home/xl198/remark/dec_17_small.csv')
+    df = pd.read_csv('/home/xl198/remark/dec_04_all.csv')
     print 'num',len(df)
-    total = int(len(df)*1.0/1000)+1
-    print 'total',total
-    for i in range(total):
+    total = len(df)
+    
+    for i in range(len(df)):
+        if i%100000 == 0:
+            print 'scan',i
     	convert(df.ix[base*1000+(offset-1)*total+i])
         get_pdb_and_crystal(df.ix[base*1000+(offset-1)*total+i]['ID'])
 

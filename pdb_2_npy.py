@@ -12,21 +12,21 @@ Convert pdb data into npy
 
 '''
 
-database_path = '/home/mdk24/database/filter_rmsd'
-destination_path = '/n/scratch2/xl198/data/npy'
+database_path = '/n/scratch2/xl198/data/dec_17'
+destination_path = '/n/scratch2/xl198/data/dec_17_npy'
 
 def get_pdb_and_crystal(input_file):
     # source to place crystal ligand
     crystal_source = os.path.join(config.BASE_DATA, 'H', 'addH')
     # dest to place converted ligand
-    crystal_dest = os.path.join(config.BASE_DATA, 'filter_rmsd', 'crystal_ligands')
+    crystal_dest = os.path.join(config.BASE_DATA, 'dec_17_npy', 'crystal_ligands')
     if not os.path.exists(crystal_dest):
         os.mkdir(crystal_dest)
 
     # source to place pdb
     pdb_source = os.path.join(config.BASE_DATA, 'H', 'data')
     # dest to place pdb
-    pdb_dest = os.path.join(config.BASE_DATA, 'filter_rmsd', 'receptors')
+    pdb_dest = os.path.join(config.BASE_DATA, 'dec_17_npy', 'receptors')
     if not os.path.exists(pdb_dest):
         os.mkdir(pdb_dest)
 
@@ -59,7 +59,7 @@ def receptor_atom_to_number(atomname):
     return atomic_tag_number
 
 def convert_ligand(item):
-
+    print "convert",item
     try:
         prody_ligand = prody.parsePDB(item)
     except Exception:
@@ -98,28 +98,33 @@ def create_folder(folder_path):
         os.mkdir(folder_path)
 
 def run(base, offset):
-    dest_ligands_folder = os.path.join(destination_path,'ligands')
-    dest_crystal_folder = os.path.join(destination_path,'crystal')
-    dest_receptor_folder = os.path.join(destination_path,'receptor')
+    dest_ligands_folder = os.path.join(destination_path,'docked_ligands')
+    dest_crystal_folder = os.path.join(destination_path,'crystal_ligands')
+    dest_receptor_folder = os.path.join(destination_path,'receptors')
 
-    source_ligands_folder = os.path.join(database_path,'ligands')
-    source_crystal_folder = os.path.join(database_path,'crystal')
-    source_receptor_folder = os.path.join(database_path,'receptor')
+    source_ligands_folder = os.path.join(database_path,'docked_ligands')
+    source_crystal_folder = os.path.join(database_path,'crystal_ligands')
+    source_receptor_folder = os.path.join(database_path,'receptors')
 
 
     map(create_folder,[dest_crystal_folder,dest_ligands_folder,dest_receptor_folder])
 
     cur = base*1000+offset-1
-    for dirpath,dirname,filenames in chain(os.walk(source_ligands_folder),os.walk(source_crystal_folder)):
-        for f in filenames: 
-            convert_ligand(os.path.join(dirpath,f))
-       
+    con = 0
+     
 
-    for dirpath,dirname,filenames in os.walk(source_receptor_folder):
+    for dirpath,dirname,filenames in chain(os.walk(source_crystal_folder),os.walk(source_ligands_folder)):
+        for f in filenames:
+           
+            convert_ligand(os.path.join(dirpath,f))
+            con += 1
+            sys.stderr.write("convert %d\n"%(con))
+
+    for dirpath,dirname,filenames in chain(os.walk(source_receptor_folder)):
         for f in filenames:
             convert_receptor(os.path.join(dirpath,f))
-       
-
+            con += 1
+            sys.stderr.write("convert %d\n"%(con))
 
 def test():
     '''

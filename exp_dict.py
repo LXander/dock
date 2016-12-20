@@ -6,6 +6,12 @@ import os, sys
 '''
 This is to used formalize the remard in experience data.
 
+It will be killed after reaching LSF memory usage limit,
+if don't request more memory.
+
+
+bsub -q short -W 10:00  -R "rusage[mem=20000]" python exp_dict.py
+
 '''
 
 
@@ -194,6 +200,29 @@ def get_remarks_exp():
     df = pd.DataFrame(data=data, columns=columns)
     df.to_csv(output_file_path, index=False)
 
+def write_docn_dock_remark_data(file_path):
+    '''
+        extract the remark from experimental
+
+        :param file_path: file path
+        :return:
+        '''
+    name = os.path.basename(file_path)
+    brand = '_'.join(name.split('_')[0:2])
+
+    remarks = []
+    with open(file_path) as fr:
+        for line in fr:
+            if re.search('^# Remark.', line):
+                remarks.append(line.strip('\n'))
+
+    data = []
+
+
+
+    
+    return remarks
+
 
 def get_dock_remark_data(file_path):
     '''
@@ -213,9 +242,7 @@ def get_dock_remark_data(file_path):
 
     data = []
 
-    with open('/home/xl198/remarkable.txt','w') as fr:
-        for remark in remarks:
-            fr.write(remark+'\n')
+    
 
     for remark in remarks:
 
@@ -229,6 +256,21 @@ def get_dock_remark_data(file_path):
 
     return data
 
+def write_down_remarks():
+    input_path = '/n/scratch2/yw174/result/rigor_so'
+    output_file_path = '/n/scratch2/xl198/data/remark/rigor_so.csv'
+    columns = get_dock_remark_columns(read_single_path(input_path))
+
+    walk = read_file_path(input_path)
+    raw_data = [get_dock_remark_data(file_path) for file_path in walk]
+    data = []
+    for raw in raw_data:
+        for r in raw:
+            data.append(r)
+
+    with open('/home/xl198/remark/raw_rigor_so.txt','w') as fr:
+        for d in data:
+            fr.write(d+'\n')
 
 def get_remarks_dock():
     '''
@@ -251,7 +293,7 @@ def get_remarks_dock():
 
 
 def main():
-    get_remarks_dock()
+    write_down_remarks()
 
 
 if __name__ == '__main__':

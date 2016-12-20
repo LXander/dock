@@ -157,8 +157,8 @@ def get_dock_remark_columns(file_path):
 
 
     if remark:
-        remark = remark.split('{')[1:]
-        remark = [ r.strip('}_') for r in remark]
+        remark = remark.split('_{')[1:]
+        remark = [ r.strip('}') for r in remark]
         remark = [ r.split(':') for r in remark]
         columns = [ r[0] for r in remark]
         columns.insert(0, 'ID')

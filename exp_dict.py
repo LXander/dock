@@ -213,11 +213,16 @@ def get_dock_remark_data(file_path):
 
     data = []
 
+    with open('/home/xl198/remarkable.txt','w') as fr:
+        for remark in remarks:
+            fr.write(remark+'\n')
+
     for remark in remarks:
+
         remark = remark.split('{')[1:]
         remark = [r.strip('}_') for r in remark]
         remark = [r.split(':') for r in remark]
-        datum = [r[1] for r in remark]
+        datum = [r[1] if len(r)>1 else '' for r in remark]
         result = standarlize_dock(datum)
         result.insert(0, brand)
         data.append(result)

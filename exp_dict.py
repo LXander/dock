@@ -7,6 +7,8 @@ import os, sys
 This is to used formalize the remard in experience data.
 
 '''
+
+
 def get_id(filename):
     '''
     extract the ID of a file
@@ -15,6 +17,7 @@ def get_id(filename):
     '''
     ID = '_'.join(filename.split('_')[0:2])
     return ID
+
 
 def standarlize_exp(data):
     '''
@@ -50,6 +53,7 @@ def standarlize_exp(data):
                 result.append(nums)
     return result
 
+
 def standarlize_dock(data):
     result = []
     for i in range(len(data)):
@@ -58,8 +62,8 @@ def standarlize_dock(data):
         elif i == 1:
             result.append(data[i])
             result.append(int(data[i].split('_')[1]))
-	elif data[i] == 'NA':
-	    result.append('')
+        elif data[i] == 'NA':
+            result.append('')
         else:
 
             m = re.match('\[(.*)\]', data[i])
@@ -70,15 +74,21 @@ def standarlize_dock(data):
                 nums = [float(n) for n in nums]
                 result.append(nums)
             else:
-		
-                result.append(float(data[i]))
+                converted = ''
+                try:
+                    converted = float(data[i])
+                except:
+                    pass
+                result.append(converted)
     return result
+
 
 def read_single_path(input_path):
     for dirname, dirnames, filenames in os.walk(input_path):
         for filename in filenames:
             file_path = os.path.join(dirname, filename)
             return file_path
+
 
 def read_file_path(input_path):
     '''
@@ -91,6 +101,7 @@ def read_file_path(input_path):
         for filename in filenames:
             file_path = os.path.join(dirname, filename)
             yield file_path
+
 
 def get_remark_columns(file_path):
     '''
@@ -116,6 +127,7 @@ def get_remark_columns(file_path):
         columns.insert(0, 'ID')
 
     return columns
+
 
 def get_remark_data(file_path):
     '''
@@ -144,6 +156,7 @@ def get_remark_data(file_path):
 
     return data
 
+
 def get_dock_remark_columns(file_path):
     name = os.path.basename(file_path)
     brand = '_'.join(name.split('_')[0:2])
@@ -154,17 +167,16 @@ def get_dock_remark_columns(file_path):
             if re.search('^# Remark', line):
                 remark = line.strip('\n')
 
-
-
     if remark:
         remark = remark.split('_{')[1:]
-        remark = [ r.strip('}') for r in remark]
-        remark = [ r.split(':') for r in remark]
-        columns = [ r[0] for r in remark]
+        remark = [r.strip('}') for r in remark]
+        remark = [r.split(':') for r in remark]
+        columns = [r[0] for r in remark]
         columns.insert(0, 'ID')
-        columns.insert(3,'inner_index')
+        columns.insert(3, 'inner_index')
 
     return columns
+
 
 def get_remarks_exp():
     '''
@@ -181,6 +193,7 @@ def get_remarks_exp():
 
     df = pd.DataFrame(data=data, columns=columns)
     df.to_csv(output_file_path, index=False)
+
 
 def get_dock_remark_data(file_path):
     '''
@@ -206,10 +219,11 @@ def get_dock_remark_data(file_path):
         remark = [r.split(':') for r in remark]
         datum = [r[1] for r in remark]
         result = standarlize_dock(datum)
-	result.insert(0,brand)
+        result.insert(0, brand)
         data.append(result)
 
     return data
+
 
 def get_remarks_dock():
     '''
@@ -227,9 +241,8 @@ def get_remarks_dock():
         for r in raw:
             data.append(r)
 
-    df = pd.DataFrame(data = data,columns = columns)
-    df.to_csv(output_file_path,index=False)
-
+    df = pd.DataFrame(data=data, columns=columns)
+    df.to_csv(output_file_path, index=False)
 
 
 def main():

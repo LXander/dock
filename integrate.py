@@ -28,8 +28,9 @@ def make_ligand_index():
     offset = [0]
     for dirpath,dirnames,filenames in chain(os.walk(os.path.join(source_path,'crystal_ligands')),os.walk(os.path.join(source_path,'docked_ligands'))):
         for filename in filenames:
+            #print os.path.join(dirpath,filename)
             npy = np.reshape(np.load(os.path.join(dirpath,filename)),(-1,4))
-            ids.append('_'.join(filename.split('.')[0].split('_')[:3]))
+            ids.append(filename.split('.')[0])
             #ids.append(filename.split('.')[0])
             rec.append(dirpath.split('/')[-1])
             offset.append(npy.shape[0])
@@ -86,5 +87,5 @@ def make_receptor_index():
     record.to_csv(os.path.join(dest_folder, 'train_set_receptors.csv'), index=False)
 
 
-make_ligand_index()
 make_receptor_index()
+make_ligand_index()

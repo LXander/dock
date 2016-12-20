@@ -216,8 +216,8 @@ def get_remarks_dock():
     extract remark from dock result
     :return:
     '''
-    input_path = '/n/scratch2/yw174/result/fast'
-    output_file_path = '/n/scratch2/xl198/data/remark/fast.csv'
+    input_path = '/n/scratch2/yw174/result/rigor_so'
+    output_file_path = '/n/scratch2/xl198/data/remark/rigor_so.csv'
     columns = get_dock_remark_columns(read_single_path(input_path))
 
     walk = read_file_path(input_path)

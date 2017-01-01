@@ -12,21 +12,21 @@ Convert pdb data into npy
 
 '''
 
-database_path = '/n/scratch2/xl198/data/dec_17'
-destination_path = '/n/scratch2/xl198/data/dec_17_npy'
+database_path = '/n/scratch2/xl198/data/dec_17_large'
+destination_path = '/n/scratch2/xl198/data/dec_17_large_npy'
 
 def get_pdb_and_crystal(input_file):
     # source to place crystal ligand
     crystal_source = os.path.join(config.BASE_DATA, 'H', 'addH')
     # dest to place converted ligand
-    crystal_dest = os.path.join(config.BASE_DATA, 'dec_17_npy', 'crystal_ligands')
+    crystal_dest = os.path.join(config.BASE_DATA, 'dec_17_large_npy', 'crystal_ligands')
     if not os.path.exists(crystal_dest):
         os.mkdir(crystal_dest)
 
     # source to place pdb
     pdb_source = os.path.join(config.BASE_DATA, 'H', 'data')
     # dest to place pdb
-    pdb_dest = os.path.join(config.BASE_DATA, 'dec_17_npy', 'receptors')
+    pdb_dest = os.path.join(config.BASE_DATA, 'dec_17_large_npy', 'receptors')
     if not os.path.exists(pdb_dest):
         os.mkdir(pdb_dest)
 

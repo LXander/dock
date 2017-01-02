@@ -12,8 +12,8 @@ Convert pdb data into npy
 
 '''
 
-database_path = '/n/scratch2/xl198/data/dec_17_large'
-destination_path = '/n/scratch2/xl198/data/dec_17_large_npy'
+database_path = '/n/scratch2/xl198/data/jan_01'
+destination_path = '/n/scratch2/xl198/data/jan_01_npy'
 
 def get_pdb_and_crystal(input_file):
     # source to place crystal ligand
@@ -115,7 +115,7 @@ def run(base, offset):
 
     for dirpath,dirname,filenames in chain(os.walk(source_crystal_folder),os.walk(source_ligands_folder)):
         for f in filenames:
-           
+             
             convert_ligand(os.path.join(dirpath,f))
             con += 1
             sys.stderr.write("convert %d\n"%(con))
@@ -126,22 +126,6 @@ def run(base, offset):
             con += 1
             sys.stderr.write("convert %d\n"%(con))
 
-def test():
-    '''
-    extract docked ligand from a given file
-    '''
-    base=0
-    offset = 1
-    df = pd.read_csv('/n/scratch2/xl198/data/remark/qualify.csv')
-    #convert(df.ix[base * 1000 + offset - 1])
-
-def get():
-    '''
-    get crystal ligand and receptor
-    '''
-    df = pd.read_csv('/n/scratch2/xl198/data/remark/valid.csv')
-    for i in range(len(df)):
-        get_pdb_and_crystal(df.ix[i]['ID'])
 
 def main():
     args = sys.argv

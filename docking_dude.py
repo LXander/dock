@@ -50,7 +50,9 @@ def get_decoy_list(folder,path):
     folderCreate()
 
 
-
+def output_file(path):
+    tmp = re.sub('/actives/','/docked/',path)
+    return re.sub('/decoys/','/docked/',tmp)
 
 def make_list_for_onefolder(folder,path='/n/scratch2/xl198/dude/data/all'):
     folderPath = os.path.join(path,folder)
@@ -66,8 +68,8 @@ def make_list_for_onefolder(folder,path='/n/scratch2/xl198/dude/data/all'):
 
     crystal = os.path.join(folderPath,'crystal_ligand.mol2')
     receptor = os.path.join(folderPath,'receptor.pdb')
-
-    total_list = map(lambda x:[receptor,x,crystal],actives+decoys)
+    
+    total_list = map(lambda x:[receptor,x,crystal,output_file(x)],actives+decoys)
 
     return total_list
 
@@ -76,7 +78,7 @@ def make_list_for_onefolder(folder,path='/n/scratch2/xl198/dude/data/all'):
 def create_docking_list():
     lists = map(lambda x:make_list_for_onefolder(x),receptor_list)
     total = reduce(lambda x,y:x+y,lists)
-    df = pd.DataFrame(data = total,columns=['receptor','ligand','ligand_box'])
+    df = pd.DataFrame(data = total,columns=['receptor','ligand','ligand_box','output'])
     df.to_csv('/n/scratch2/xl198/dude/frame/list.csv',index=False)
 
 

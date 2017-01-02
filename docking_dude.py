@@ -53,10 +53,11 @@ def get_decoy_list(folder,path):
 
 
 def make_list_for_onefolder(folder,path='/n/scratch2/xl198/dude/data/all'):
-    folderPath = os.path.join(folder,path)
+    folderPath = os.path.join(path,folder)
+    print "folder path",folderPath
     unzip('actives_final.mol2.gz',folderPath)
     unzip('decoys_final.mol2.gz',folderPath)
-    folderCreate()
+    folderCreate(folderPath)
     split_mol2(folderPath)
     actives = os.listdir(os.path.join(folderPath,'actives'))
     decoys = os.listdir(os.path.join(folderPath,'decoys'))
@@ -73,10 +74,10 @@ def make_list_for_onefolder(folder,path='/n/scratch2/xl198/dude/data/all'):
 
 
 def create_docking_list():
-    lists = map(lambda x:make_list_for_onefolder,receptor_list)
+    lists = map(lambda x:make_list_for_onefolder(x),receptor_list)
     total = reduce(lambda x,y:x+y,lists)
-    df = pd.DataFrame(data = total,columst=['receptor','ligand','ligand_box'])
-    df.to_csv('/n/scratch2/xl198/dude/frame/list.csv',index=False,columns=False)
+    df = pd.DataFrame(data = total,columns=['receptor','ligand','ligand_box'])
+    df.to_csv('/n/scratch2/xl198/dude/frame/list.csv',index=False)
 
 
 

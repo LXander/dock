@@ -34,13 +34,15 @@ def getSourceFolder():
     return map(lambda x:[x,os.path.join(sourceBase,x,'docked')],receptor_list)
 
 def getReceptor():
+    receptorFolder = os.path.join(destSource,'receptors')
+    createFolder(receptorFolder)
     receptor_list = ['cxcr4', 'comt', 'inha', 'fabp4', 'ampc']
     source = map(lambda x:os.path.join(sourceBase,x,'receptor.pdb'),receptor_list)
     dest = map(lambda x:os.path.join(destSource,'receptors',x+'.pdb'),receptor_list)
     pairs = zip(source,dest)
 
     cmds = map(lambda x:"cp {} {}".format(x[0],x[1]),pairs)
-    print cmds
+    map(lambda x:os.popen(x),cmds)
 
 
 
@@ -56,5 +58,5 @@ def convert():
                 if not os.path.exists(targetPath):
                     os.popen(command)
 
-
-
+convert()
+getReceptor()

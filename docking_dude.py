@@ -85,5 +85,23 @@ def create_docking_list():
 
 create_docking_list()
 
+smina = '/home/xl198/program/smina/smina.static'
+
+def run(offset):
+    df = pd.read_csv('/n/scratch2/xl198/dude/frame/list.csv')
+    indexes = range(offset-1,len(df),1000)
+    for i in indexes:
+        receptor,ligand,ligand_box,output = df.ix[i]
+        command = "{} -r {} -l {} --autobox_ligand {} -o {} "\
+            .format(smina,receptor,ligand,ligand_box,output)
+
+        print command
+
+if __name__ == '__main__':
+
+    argv = sys.argv
+    if len(argv)>=2:
+        pass
+
 
 

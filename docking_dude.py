@@ -83,25 +83,40 @@ def create_docking_list():
 
 
 
-create_docking_list()
+
 
 smina = '/home/xl198/program/smina/smina.static'
 
 def run(offset):
-    df = pd.read_csv('/n/scratch2/xl198/dude/frame/list.csv')
-    indexes = range(offset-1,len(df),1000)
+    df = pd.read_csv('/n/scratch2/xl198/dude/frame/remain.csv')
+    remain = []
+    if offset:
+    	indexes = range(offset-1,len(df),1000)
+    else:
+        indexes = range(len(df))
     for i in indexes:
         receptor,ligand,ligand_box,output = df.ix[i]
-        command = "{} -r {} -l {} --autobox_ligand {} -o {} "\
+        command = "{} -r {} -l {} --autobox_ligand {} -o {} --num_modes=1000 --energy_range=100 --cpu=1"\
             .format(smina,receptor,ligand,ligand_box,output)
 
-        print command
+        #print command
+        if not os.path.exists(output):
+            if offset:
+                os.popen(command)
+            else:
+                remain.append([receptor,ligand,ligand_box,output])
+
+    remain_df = pd.DataFrame(data = remain,columns=['receptor','ligand','ligand_box','output'])
+    remain_df.to_csv('/n/scratch2/xl198/dude/frame/remain.csv',index=False)
 
 if __name__ == '__main__':
 
     argv = sys.argv
     if len(argv)>=2:
-        pass
+        run(int(argv[1]))
+    else:
+        print "not enough args, need 2 receive {}".format(len(argv))
+        print "e.g. python docking_dude.py 1"
 
 
 

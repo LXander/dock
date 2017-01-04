@@ -48,19 +48,30 @@ def getReceptor():
 
 
 
-def convert():
+def convert(offset):
     folders = getSourceFolder()
+    count = 0
     for receptor,folder in folders:
         for dirpath,dirname,filenames in os.walk(folder):
             for filename in filenames:
-                filePath = os.path.join(dirpath,filename)
+                count +=1
+                if (offset%1000 == count%1000):
+                    filePath = os.path.join(dirpath,filename)
                 
-                targetPath = prepareTarget(filePath,receptor)
-                for i in range(1,11):
-                    numberTarget = re.sub('\.',str(i)+'.',targetPath)
-                    command = 'obabel -ipdb {} -f {} -l {} -opdb -O {} '.format(filePath,i,i,numberTarget)
-                    if not os.path.exists(numberTarget):
-                        os.popen(command)
+                    targetPath = prepareTarget(filePath,receptor)
+                    for i in range(1,401):
+                        numberTarget = re.sub('\.',str(i)+'.',targetPath)
+                        command = 'obabel -ipdb {} -f {} -l {} -opdb -O {} '.format(filePath,i,i,numberTarget)
+                        if not os.path.exists(numberTarget):
+                            os.popen(command)
 
-convert()
-getReceptor()
+if __name__ == '__main__':
+    args = sys.argv
+    if len(args)<2:
+        print "not enough args"
+    else :
+        convert(int(args[1]))    
+
+
+#convert()
+#getReceptor()

@@ -12,8 +12,8 @@ Convert pdb data into npy
 
 '''
 
-database_path = '/n/scratch2/xl198/dude/data//jan_04/pdbs'
-destination_path = '/n/scratch2/xl198/dude/data/jan_04/npys'
+database_path = '/n/scratch2/xl198/dude/data/dude/pdbs'
+destination_path = '/n/scratch2/xl198/dude/data/jan_05'
 
 def get_pdb_and_crystal(input_file):
     # source to place crystal ligand
@@ -126,7 +126,7 @@ def run(base, offset):
     for dirpath,dirname,filenames in chain(os.walk(source_crystal_folder),os.walk(source_ligands_folder)):
         for f in filenames:
              
-            convert_ligand(os.path.join(dirpath,f))
+            #convert_ligand(os.path.join(dirpath,f))
             con += 1
             sys.stderr.write("convert %d\n"%(con))
 

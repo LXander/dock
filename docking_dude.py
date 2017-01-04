@@ -87,8 +87,26 @@ def create_docking_list():
 
 smina = '/home/xl198/program/smina/smina.static'
 
+def score(offset):
+    df = pd.read_csv("/n/scratch2/xl198/dude/code/crystal.csv")
+    indexes = range(len(df))
+    result = []
+    for i in indexes:
+        receptor,ligand,ligand_box,output = df.ix[i]
+        command = "{} -r {} -l {} --autobox_ligand {}  --num_modes=1000 --energy_range=100 --cpu=1 --score_only"\
+            .format(smina,receptor,ligand,ligand_box)
+
+        l = os.popen(command)
+        ls = l.read()
+        m = re.search('Affinity: (.*)\(',ls)
+        if m:
+	    affinity = float(m.groups()[0])
+            result.append([os.path.basename(ligand),affinity])
+    df = pd.DataFrame(data = result,columns = ['filename','energy'])
+    df.to_csv("/n/scratch2/xl198/dude/code/crystal_score.csv",index=False)
+
 def run(offset):
-    df = pd.read_csv('/n/scratch2/xl198/dude/frame/remain.csv')
+    df = pd.read_csv('/n/scratch2/xl198/dude/code/crystal.csv')
     remain = []
     if offset:
     	indexes = range(offset-1,len(df),1000)
@@ -96,7 +114,7 @@ def run(offset):
         indexes = range(len(df))
     for i in indexes:
         receptor,ligand,ligand_box,output = df.ix[i]
-        command = "{} -r {} -l {} --autobox_ligand {} -o {} --num_modes=1000 --energy_range=100 --cpu=1"\
+        command = "{} -r {} -l {} --autobox_ligand {} -o {} --num_modes=1000 --energy_range=100 --cpu=1 "\
             .format(smina,receptor,ligand,ligand_box,output)
 
         #print command
@@ -105,6 +123,9 @@ def run(offset):
                 os.popen(command)
             else:
                 remain.append([receptor,ligand,ligand_box,output])
+        
+        
+        
 
     remain_df = pd.DataFrame(data = remain,columns=['receptor','ligand','ligand_box','output'])
     remain_df.to_csv('/n/scratch2/xl198/dude/frame/remain.csv',index=False)
@@ -113,7 +134,8 @@ if __name__ == '__main__':
 
     argv = sys.argv
     if len(argv)>=2:
-        run(int(argv[1]))
+        score(int(argv[1]))
+        #run(int(argv[1]))
     else:
         print "not enough args, need 2 receive {}".format(len(argv))
         print "e.g. python docking_dude.py 1"

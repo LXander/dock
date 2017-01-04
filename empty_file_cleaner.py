@@ -24,6 +24,6 @@ def remove():
         rm(df.ix[i]['Path'])
     
 
-input_path = '/n/scratch2/xl198/dude/code/receptor'
+input_path = '/n/scratch2/xl198/dude/data/jan_05'
 
 record()

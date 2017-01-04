@@ -10,7 +10,7 @@ import re
     # move crystal ligand and receptor into folder
 
 sourceBase = '/n/scratch2/xl198/dude/data/all'
-destSource = '/n/scratch2/xl198/dude/data/jan_03/pdbs'
+destSource = '/n/scratch2/xl198/dude/data/jan_04/pdbs'
 
 destFolders = ['crystal_ligands',  'docked_ligands' , 'receptors']
 
@@ -21,7 +21,8 @@ def createFolder(folderPath):
 
 def prepareTarget(filePath,receptor):
     baseName = os.path.basename(filePath)
-    targetName = receptor+'_'+baseName
+    baseTarget = re.sub('\.','_.',baseName)
+    targetName = receptor+'_'+baseTarget
     targetFolder = os.path.join(destSource,'docked_ligands',receptor)
     createFolder(targetFolder)
     targetFile = os.path.join(targetFolder,targetName)
@@ -41,8 +42,9 @@ def getReceptor():
     dest = map(lambda x:os.path.join(destSource,'receptors',x+'.pdb'),receptor_list)
     pairs = zip(source,dest)
 
-    cmds = map(lambda x:"cp {} {}".format(x[0],x[1]),pairs)
+    cmds = map(lambda x:"obabel -ipdb {} -opdb -O  {}".format(x[0],x[1]),pairs)
     map(lambda x:os.popen(x),cmds)
+
 
 
 
@@ -52,11 +54,13 @@ def convert():
         for dirpath,dirname,filenames in os.walk(folder):
             for filename in filenames:
                 filePath = os.path.join(dirpath,filename)
+                
                 targetPath = prepareTarget(filePath,receptor)
-
-                command = 'obabel -ipdb {} -f 1 -l 1 -opdb -O {} '.format(filePath,targetPath)
-                if not os.path.exists(targetPath):
-                    os.popen(command)
+                for i in range(1,11):
+                    numberTarget = re.sub('\.',str(i)+'.',targetPath)
+                    command = 'obabel -ipdb {} -f {} -l {} -opdb -O {} '.format(filePath,i,i,numberTarget)
+                    if not os.path.exists(numberTarget):
+                        os.popen(command)
 
 convert()
 getReceptor()

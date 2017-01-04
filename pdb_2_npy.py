@@ -12,8 +12,8 @@ Convert pdb data into npy
 
 '''
 
-database_path = '/n/scratch2/xl198/data/jan_01'
-destination_path = '/n/scratch2/xl198/data/jan_01_npy'
+database_path = '/n/scratch2/xl198/dude/data//jan_04/pdbs'
+destination_path = '/n/scratch2/xl198/dude/data/jan_04/npys'
 
 def get_pdb_and_crystal(input_file):
     # source to place crystal ligand
@@ -55,11 +55,14 @@ def ligand_atom_to_number(atomname):
 
 
 def receptor_atom_to_number(atomname):
+    if atomname.lower() not in atom_dictionary.REC.keys():
+        print "no atom name ",atomname.lower()
     atomic_tag_number = atom_dictionary.REC[atomname.lower()]
+    #print atomic_tag_number
     return atomic_tag_number
 
 def convert_ligand(item):
-    print "convert",item
+    print "convert ",item
     try:
         prody_ligand = prody.parsePDB(item)
     except Exception:
@@ -83,13 +86,20 @@ def convert_receptor(item):
         pass
 
     try:
+        
         atom_numbers = map(receptor_atom_to_number, prody_ligand.getElements())
+	print "get_atom_num"
         coordinates_and_atoms = np.hstack((prody_ligand.getCoords(), np.reshape(atom_numbers, (-1, 1))))
+
+        print "item ",item
         destination = re.sub(".pdb$",'',item)
+        print destination
         destination = re.sub(database_path,destination_path,destination)
+        print "save ",destination
         if not os.path.exists(os.path.dirname(destination)):
             os.mkdir(os.path.dirname(destination))
         np.save(destination, coordinates_and_atoms)
+	print destination        
     except Exception:
         pass
 

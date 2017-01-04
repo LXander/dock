@@ -23,6 +23,7 @@ class atom_dictionary:
     LIG["f"] = 9; LIG["p"] = 7.2; LIG["s"] = 8.2; LIG["sg"] = 8.2; LIG["cl"] = 9.2; LIG["v"] = 12; LIG["se"] = 8.4;
     LIG["br"] = 9.4; LIG["i"] = 9.6
 
+    LIG["xx"] = 7; LIG["mg"] = 9.6; LIG["zn"] = 9.5; LIG["fe"] = 9.7
 
     REC = {}
 
@@ -47,3 +48,5 @@ class atom_dictionary:
 
     REC["f"] = 29; REC["p"] = 27.2; REC["s"] = 28.2; REC["sg"] = 28.2; REC["cl"] = 29.2; REC["v"] = 32; REC["se"] = 28.4;
     REC["br"] = 29.4; REC["i"] = 29.6
+ 
+    REC["xx"] = 17; REC["mg"] = 9.6; REC["zn"] = 9.5; REC["fe"] = 9.7

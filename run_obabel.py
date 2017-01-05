@@ -11,8 +11,8 @@ and store them orderly in given path
 The souce is a csv file contain columns ['PDBname','PDBResId']
 '''
 
-dest_pdb_folder = 'jan_01'
-dest_csv_index = '/home/xl198/remark/dec_17_small.csv'
+dest_pdb_folder = 'jan_01_big'
+dest_csv_index = '/home/xl198/remark/dec_17.csv'
 
 def get_pdb_and_crystal(input_file):
     # source to place crystal ligand

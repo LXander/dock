@@ -25,7 +25,8 @@ def gunzip(gzfile):
         raise Exception("can't parse mol2 file from gz file")
     mol2file = tmp.groups()[0]
     if not os.path.exists(mol2file):
-        raise Exception("can't fild active/decoy mol2 file from",gzfile)
+        mol2file = None
+        #raise Exception("can't fild active/decoy mol2 file from",mol2file)
     return mol2file
 
 def convert(receptor):
@@ -56,6 +57,8 @@ def convert(receptor):
     # Actives
     activesGz = os.path.join(sourceBase,receptor,'actives_final.mol2.gz')
     activesMol2 = gunzip(activesGz)
+    if not activesMol2:
+        return None
     activesDestFolder = os.path.join(destBase,'docked_ligands',receptor)
     createFolder(activesDestFolder)
     activesDestFile = os.path.join(activesDestFolder,receptor+'_actives_.pdb')
@@ -65,15 +68,33 @@ def convert(receptor):
     # Decoys
     decoysGz = os.path.join(sourceBase,receptor,'decoys_final.mol2.gz')
     decoysMol2 = gunzip(decoysGz)
+    if not decoysMol2:
+        return None
     decoysDestFolder = os.path.join(destBase,'docked_ligands',receptor)
     createFolder(decoysDestFolder)
     decoysDestFile = os.path.join(decoysDestFolder,receptor+'_decoys_.pdb')
     decoysCmd = 'obabel -imol2 {} -opdb -O {} -m'.format(decoysMol2,decoysDestFile)
     os.popen(decoysCmd)
 
-def run():
+def runs():
     map(lambda receptor:convert(receptor),os.listdir(sourceBase))
 
-createBaseFolder()
-run()
+
+
+#run()
 #convert('comt')
+
+if __name__=='__main__':
+    createBaseFolder()
+    receptors = os.listdir(sourceBase)
+    args = sys.argv
+    if len(args)<2:
+        print "not enouth args, need 2 input {}".format(len(args))
+    else:
+       offset = int(args[1])-1
+       if offset<len(receptors):
+            convert(receptors[offset])
+       else:
+            print "offset overflow, total size {} input {}".format(len(receptors),offset)
+
+

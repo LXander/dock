@@ -13,10 +13,10 @@ def record():
 		    records.append(filepath)
 
     df = pd.DataFrame(data = records,columns = ['Path'])
-    df.to_csv(os.path.join(input_path,'record.csv'), index = False)
+    df.to_csv('empty_record.csv', index = False)
 
 def remove():
-    df = pd.read_csv(os.path.join(input_path,'record.csv'))
+    df = pd.read_csv('empty_record.csv')
     rm = lambda x:os.popen("rm "+x)
     #rm = lambda x:print("rm "+x)
     #df['Path'].apply(rm)
@@ -24,6 +24,6 @@ def remove():
         rm(df.ix[i]['Path'])
     
 
-input_path = '/n/scratch2/xl198/dude/data/jan_05'
+input_path = '/n/scratch2/xl198/dude/data/dude_400/pdbs/docked_ligands'
 
-record()
+remove()

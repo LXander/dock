@@ -30,6 +30,10 @@ def folderCreate(path):
         if not os.path.exists(folderPath):
             os.mkdir(folderPath)
 
+def createFolder(path):
+    if not os.path.exists(path):
+        os.mkdir(path)
+
 def split_mol2(folderPath):
 
     source_actives = os.path.join(folderPath,'actives_final.mol2')
@@ -88,7 +92,7 @@ def create_docking_list():
 smina = '/home/xl198/program/smina/smina.static'
 
 def score(offset):
-    df = pd.read_csv("/n/scratch2/xl198/dude/code/crystal.csv")
+    df = pd.read_csv("/n/scratch2/xl198/dude/code/dude.csv")
     indexes = range(len(df))
     result = []
     for i in indexes:
@@ -134,8 +138,8 @@ if __name__ == '__main__':
 
     argv = sys.argv
     if len(argv)>=2:
-        score(int(argv[1]))
-        #run(int(argv[1]))
+        #score(int(argv[1]))
+        run(int(argv[1]))
     else:
         print "not enough args, need 2 receive {}".format(len(argv))
         print "e.g. python docking_dude.py 1"

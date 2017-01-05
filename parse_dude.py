@@ -8,6 +8,8 @@ import re
 
 sourceBase = '/n/scratch2/xl198/dude/data/all'
 destBase = '/n/scratch2/xl198/dude/data/dude/pdbs'
+dockingIndex = '/n/scratch2/xl198/dude/code/crystal.csv'
+smina = '/home/xl198/program/smina/smina.static'
 
 def createFolder(folderPath):
     if not os.path.exists(folderPath):
@@ -79,10 +81,34 @@ def convert(receptor):
 def runs():
     map(lambda receptor:convert(receptor),os.listdir(sourceBase))
 
+def docking():
+    pass
+
+def docking_offset(offset):
+    df = pd.read_csv(dockingIndex)
+    remain = []
+    if offset:
+        index = range(offset,len(df)+1,1000)
+    else:
+        index = range(1,len(df)+1)
+    for i in index:
+        receptor, ligand, ligand_box, output = df.ix[i-1]
+        command = "{} -r {} -l {} --autobox_ligand {} -o {} --num_modes=1000 --energy_range=100 --cpu=1 " \
+            .format(smina, receptor, ligand, ligand_box, output)
+        createFolder(os.path.dirname(output))
+
+        if not os.path.exists(output):
+            if offset:
+                #os.popen(command)
+                print command
+            else:
+                remain.append([receptor,ligand,ligand_box,output])
+
+        if not offset:
+            remain_df = pd.DataFrame(data=remain, columns=['receptor', 'ligand', 'ligand_box', 'output'])
+            remain_df.to_csv('/n/scratch2/xl198/dude/frame/remain.csv', index=False)
 
 
-#run()
-#convert('comt')
 
 if __name__=='__main__':
     createBaseFolder()
@@ -91,10 +117,7 @@ if __name__=='__main__':
     if len(args)<2:
         print "not enouth args, need 2 input {}".format(len(args))
     else:
-       offset = int(args[1])-1
-       if offset<len(receptors):
-            convert(receptors[offset])
-       else:
-            print "offset overflow, total size {} input {}".format(len(receptors),offset)
+       offset = int(args[1])
+       docking_offset(offset)
 
 

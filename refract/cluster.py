@@ -18,7 +18,7 @@ class cluster:
         for dirpath,dirname,filenames in os.walk(sourcePath):
             for filename in filenames:
                 if not len(open(os.path.join(dirpath,filename)).readlines()):
-                    print("empty ",filename)
+                    #print("empty ",filename)
                     continue   
                 yield os.path.join(dirpath,filename)
 
@@ -50,7 +50,7 @@ class cluster:
         labeledResult = np.hstack((ligands,receptors,inner_index,clusterResult))
 
 
-        return labeledResult
+        return labeledResult.astype(str)
 
 
 
@@ -70,13 +70,35 @@ class cluster:
 
         df.to_csv(savePath,index=False)
 
-    def writeDownCluster(self,filePath,savePath):
+    def writeDownCluster(self,filePath,savePath,clusterNum):
+
         for path in self.get_file_path(filePath):
-            pass        
+            labeledResult = self.hierarchy_cluster(path,clusterNum)
+            with open(savePath,'a') as fout:
+                for result in labeledResult:
+                    fout.write(','.join(result)+'\n')
+
+    def processAll(self,filePath,savePath,clusterNum):
+        folders = map(lambda x:os.path.join(filePath,x),['ampc','comt','cxcr4','fabp4','inha'])
+        for folder in folders:
+            self.writeDownCluster(folder,savePath,clusterNum)
+
 
 if __name__ == '__main__':
     c = cluster()
     print("start")
+    c.processAll("/n/scratch2/xl198/dude/data/dude/docked_dude/docked_ligands",
+                 "/n/scratch2/xl198/dude/frame/cluster_2.csv",2)
+    c.processAll("/n/scratch2/xl198/dude/data/dude/docked_dude/docked_ligands",
+                 "/n/scratch2/xl198/dude/frame/cluster_2.csv", 3)
+    c.processAll("/n/scratch2/xl198/dude/data/dude/docked_dude/docked_ligands",
+                 "/n/scratch2/xl198/dude/frame/cluster_2.csv", 5)
+    c.processAll("/n/scratch2/xl198/dude/data/dude/docked_dude/docked_ligands",
+                 "/n/scratch2/xl198/dude/frame/cluster_2.csv", 10)
+    c.processAll("/n/scratch2/xl198/dude/data/dude/docked_dude/docked_ligands",
+                 "/n/scratch2/xl198/dude/frame/cluster_2.csv", 20)
+
+
     #c.test("/n/scratch2/xl198/dude/data/dude/docked_dude/docked_ligands")
     #c.test("/n/scratch2/xl198/dude/data/dude_400/pdbs/docked_ligands")
     

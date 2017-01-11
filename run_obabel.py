@@ -11,8 +11,8 @@ and store them orderly in given path
 The souce is a csv file contain columns ['PDBname','PDBResId']
 '''
 
-dest_pdb_folder = 'jan_01_big'
-dest_csv_index = '/home/xl198/remark/dec_17.csv'
+dest_pdb_folder = 'jan_09'
+dest_csv_index = '/home/xl198/remark/dec_17_small.csv'
 
 def get_pdb_and_crystal(input_file):
     # source to place crystal ligand
@@ -44,7 +44,7 @@ def get_pdb_and_crystal(input_file):
 
     crystal_out = os.path.join(crystal_path,filename+'.pdb')
     if not os.path.exists(crystal_out):
-        cmd = 'obabel -ipdb %s -opdb -O %s -d'%(crystal_in,crystal_out)
+        cmd = 'obabel -ipdb %s -opdb -O %s'%(crystal_in,crystal_out)
         os.system(cmd)
 
 def convert(item):

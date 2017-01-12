@@ -220,8 +220,8 @@ class kaggleDataset:
 
         receptorAndCrystal['receptor_sourcepath'] = receptorAndCrystal.apply(
             lambda item: os.path.join(self.receptor_base,
-                                      receptorAndCrystal['PDBname'],
-                                      receptorAndCrystal['PDBname'] + '.pdb'),
+                                      item['PDBname'],
+                                      item['PDBname'] + '.pdb'),
             axis=1
         )
 
@@ -235,9 +235,9 @@ class kaggleDataset:
 
         receptorAndCrystal['crystal_sourcepath'] = receptorAndCrystal.apply(
             lambda item: os.path.join(self.crystal_base,
-                                      receptorAndCrystal['PDBname'],
-                                      '_'.join([receptorAndCrystal['PDBname'],
-                                               receptorAndCrystal['RES'],
+                                      item['PDBname'],
+                                      '_'.join([item['PDBname'],
+                                               item['RES'],
                                                'ligand.pdb'])),
             axis=1
         )
@@ -289,17 +289,17 @@ class kaggleDataset:
 
         receptorAndCrystal['receptor_sourcepath'] = receptorAndCrystal.apply(
             lambda item: os.path.join(self.receptor_base,
-                                      receptorAndCrystal['PDBname'],
-                                      receptorAndCrystal['PDBname'] + '.pdb'),
+                                      item['PDBname'],
+                                      item['PDBname'] + '.pdb'),
             axis=1
         )
 
 
         receptorAndCrystal['crystal_sourcepath'] = receptorAndCrystal.apply(
             lambda item: os.path.join(self.crystal_base,
-                                      receptorAndCrystal['PDBname'],
-                                      '_'.join([receptorAndCrystal['PDBname'],
-                                               receptorAndCrystal['RES'],
+                                      item['PDBname'],
+                                      '_'.join([item['PDBname'],
+                                               item['RES'],
                                                'ligand.pdb'])),
             axis=1
         )

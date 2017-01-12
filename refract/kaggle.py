@@ -254,6 +254,11 @@ class kaggleDataset:
             axis=1
         )
 
+        docked_dest = trainset[['PDBname', 'RES', 'DestPath']]
+        crystal_dest = receptorAndCrystal[['PDBname', 'RES', 'crystal_destpath']]
+        docked_crystal_pair = docked_dest.merge(crystal_dest, on=['PDBname', 'RES'])
+        self.write_dataframe(docked_crystal_pair, 'train_docked_crystal_pair')
+
         return trainset,receptorAndCrystal
 
     def code_test_set(self,testset,coded=False):
@@ -307,11 +312,11 @@ class kaggleDataset:
         )
 
 
-
-
         if coded:
-
-
+            # assign a code for each docked liagnd and crystal ligand
+            # assign a code for receptor in each recptor-crystal ligand pair
+            # usually a receptor pair with multiple crystal ligand,
+            # it will have more than one code
 
             code = np.arange(len(testset)+len(receptorAndCrystal)*2)
             random.shuffle(code)
@@ -320,7 +325,7 @@ class kaggleDataset:
             receptorAndCrystal['crystal_code']  = code[len(receptorAndCrystal):len(receptorAndCrystal)*2]
             testset['ligand_code']              = code[len(receptorAndCrystal)*2:]
 
-            testset['Coded_destpath'] = testset.apply(
+            testset['code_destpath'] = testset.apply(
                 lambda item:os.path.join(self.kaggleBasePath,
                                          "unlabeled_pdb",
                                          "ligands",
@@ -349,6 +354,14 @@ class kaggleDataset:
                                          'L'+str(item['crystal_code'])+'.pdb'),
                 axis=1
             )
+
+
+        docked_dest= testset[['PDBname','RES','coded_destpath']]
+        crystal_dest = receptorAndCrystal[['PDBname','RES','code_crystal_destpath']]
+        docked_crystal_pair = docked_dest.merge(crystal_dest,on=['PDBname','RES'])
+        self.write_dataframe(docked_crystal_pair,'test_docked_crystal_pair')
+
+
 
 
         return testset,receptorAndCrystal

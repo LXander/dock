@@ -191,7 +191,7 @@ class kaggleDataset:
         for t in thread_list:
             t.join()
 
-    def convert(self,dataframe,coded=False):
+    def convert(self,dataframe,coded=False,is_docked=True):
         '''
         according the result of 'database_from_csv' get splited pdb file
         and put them in to dest directory
@@ -202,6 +202,8 @@ class kaggleDataset:
         :return:
         '''
 
+        convert_func = self.entry_convert if is_docked else self.receptor_crystal_convert
+
         if type(dataframe) == str:
             try:
                 dataframe = pd.read_csv(dataframe)
@@ -210,7 +212,7 @@ class kaggleDataset:
 
         edge = np.linspace(0,len(dataframe),self.process_num+1).astype(int)
         process_list = [ multiprocessing.Process(target=self.process_convert,
-                                                 args=(self.entry_convert,
+                                                 args=(convert_func,
                                                        dataframe,
                                                        coded,
                                                        range(edge[i],
@@ -528,5 +530,8 @@ class kaggleDataset:
 if __name__ == '__main__':
     kaggle = kaggleDataset('jan_11')
     #kaggle.database_from_csv('/home/xl198/remark/dec_17_small.csv')
-    kaggle.convert('/n/scratch2/xl198/data/jan_11/temp/train_set.csv')
+    #kaggle.convert('/n/scratch2/xl198/data/jan_11/temp/train_set.csv')
+    kaggle.convert('/n/scratch2/xl198/data/jan_11/temp/train_docked_crystal_pair.csv',is_docked=False)
+    #kaggle.convert('/n/scratch2/xl198/data/jan_11/temp/test_set.csv',coded=True)
+    #kaggle.convert('/n/scratch2/xl198/data/jan_11/temp/test_docked_crystal_pair.csv',coded=True,is_docked=True)
 

@@ -90,13 +90,13 @@ if __name__ == '__main__':
     c.processAll("/n/scratch2/xl198/dude/data/dude/docked_dude/docked_ligands",
                  "/n/scratch2/xl198/dude/frame/cluster_2.csv",2)
     c.processAll("/n/scratch2/xl198/dude/data/dude/docked_dude/docked_ligands",
-                 "/n/scratch2/xl198/dude/frame/cluster_2.csv", 3)
+                 "/n/scratch2/xl198/dude/frame/cluster_3.csv", 3)
     c.processAll("/n/scratch2/xl198/dude/data/dude/docked_dude/docked_ligands",
-                 "/n/scratch2/xl198/dude/frame/cluster_2.csv", 5)
+                 "/n/scratch2/xl198/dude/frame/cluster_5.csv", 5)
     c.processAll("/n/scratch2/xl198/dude/data/dude/docked_dude/docked_ligands",
-                 "/n/scratch2/xl198/dude/frame/cluster_2.csv", 10)
+                 "/n/scratch2/xl198/dude/frame/cluster_10.csv", 10)
     c.processAll("/n/scratch2/xl198/dude/data/dude/docked_dude/docked_ligands",
-                 "/n/scratch2/xl198/dude/frame/cluster_2.csv", 20)
+                 "/n/scratch2/xl198/dude/frame/cluster_20.csv", 20)
 
 
     #c.test("/n/scratch2/xl198/dude/data/dude/docked_dude/docked_ligands")

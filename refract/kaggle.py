@@ -212,11 +212,11 @@ class kaggleDataset:
                                                'ligand',
                                                'fast',
                                                item['FrameId'] + '.pdb'])),
-            asix=1
+            axis=1
         )
 
         crystalLigands = list(set(zip(trainset['PDBname'], trainset['RES'])))
-        receptorAndCrystal = pd.dataFrame(data=crystalLigands, columns=['PDBname', 'RES'])
+        receptorAndCrystal = pd.DataFrame(data=crystalLigands, columns=['PDBname', 'RES'])
 
         receptorAndCrystal['receptor_sourcepath'] = receptorAndCrystal.apply(
             lambda item: os.path.join(self.receptor_base,
@@ -285,7 +285,7 @@ class kaggleDataset:
         )
 
         crystalLigands = list(set(zip(testset['PDBname'],testset['RES'])))
-        receptorAndCrystal = pd.dataFrame(data=crystalLigands, columns=['PDBname','RES'])
+        receptorAndCrystal = pd.DataFrame(data=crystalLigands, columns=['PDBname','RES'])
 
         receptorAndCrystal['receptor_sourcepath'] = receptorAndCrystal.apply(
             lambda item: os.path.join(self.receptor_base,

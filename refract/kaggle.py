@@ -217,7 +217,8 @@ class kaggleDataset:
 
         crystalLigands = list(set(zip(trainset['PDBname'], trainset['RES'])))
         receptorAndCrystal = pd.DataFrame(data=crystalLigands, columns=['PDBname', 'RES'])
-
+        print "Train set receptro and crystal"
+        print receptorAndCrystal.columns
         receptorAndCrystal['receptor_sourcepath'] = receptorAndCrystal.apply(
             lambda item: os.path.join(self.receptor_base,
                                       item['PDBname'],
@@ -249,7 +250,8 @@ class kaggleDataset:
                                       item['PDBname'],
                                       '_'.join([item['PDBname'],
                                                item['RES'],
-                                               'ligand.pdb']))
+                                               'ligand.pdb'])),
+            axis=1
         )
 
         return trainset,receptorAndCrystal
@@ -322,7 +324,7 @@ class kaggleDataset:
                 lambda item:os.path.join(self.kaggleBasePath,
                                          "unlabeled_pdb",
                                          "ligands",
-                                         'L'+item['ligand_code']+'.pdb'),
+                                         'L'+str(item['ligand_code'])+'.pdb'),
                 axis=1
             )
 
@@ -333,7 +335,7 @@ class kaggleDataset:
                 lambda item:os.path.join(self.kaggleBasePath,
                                          "unlabeledd_pdb",
                                          "receptors",
-                                         'P'+item['receptor_code']+'.pdb'),
+                                         'P'+str(item['receptor_code'])+'.pdb'),
                 axis = 1
             )
 
@@ -344,7 +346,7 @@ class kaggleDataset:
                 lambda item:os.path.join(self.kaggleBasePath,
                                          "unlabeled_pdb",
                                          "ligands",
-                                         'L'+item['crystal_code']+'.pdb'),
+                                         'L'+str(item['crystal_code'])+'.pdb'),
                 axis=1
             )
 

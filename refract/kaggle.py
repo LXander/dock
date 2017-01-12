@@ -8,6 +8,9 @@ from util import *
 from obabel import obabelOperation
 import multiprocessing
 import threading
+from itertools import chain
+import prody
+from av2_atomdict import atom_dictionary
 
 #############################
 #
@@ -42,6 +45,12 @@ class kaggleDataset:
 
 
     def write_dataframe(self,dataframe,filename):
+        '''
+        Write dataframe to tempFolderPath
+        :param dataframe: pandas DataFrame
+        :param filename:  name of output file without suffix
+        :return:
+        '''
         dataframe.to_csv(os.path.join(self.tempFolderPath,filename+'.csv'),index=False)
 
     def generate_database_index(self,dataBasePath):
@@ -388,6 +397,84 @@ class kaggleDataset:
         train = pd.DataFrame(data = trainSet,columns=['PDBname'])
         test  = pd.DataFrame(data = testSet ,columns=['PDBname'])
         return train,test
+
+    def PDB_2_npy(self,sourceFilePath,coded,is_receptor):
+        atom_dict = atom_dictionary.REC if is_receptor else atom_dictionary.LIG
+
+        if coded:
+            destFilePath = re.sub('unlabeled_pdb', 'unlabeled_npy', sourceFilePath)
+            destFilePath = re.sub('.pdb$', '', destFilePath)
+        else:
+            destFilePath = re.sub('labeled_pdb', 'labeled_npy', sourceFilePath)
+            destFilePath = re.sub('.pdb$', '', destFilePath)
+
+        try:
+            prody_ligand = prody.parsePDB(sourceFilePath)
+        except Exception as e:
+            print e
+
+        try:
+            atom_numbers = map(lambda atomname: atom_dict[atomname.lower()],
+                               prody_ligand.getElements())
+            coordinates_and_atoms = np.hstack((prody_ligand.getCoords(),
+                                               np.reshape(atom_numbers, (-1, 1))))
+
+            np.save(destFilePath,coordinates_and_atoms)
+        except Exception as e:
+            print
+
+    def clashdetact(self,item,coded):
+        if coded:
+            docked_ligand_path = item['coded_destpath']
+            crystal_ligand_path = item['code_crystal_destpath']
+        else:
+            doced_ligand_path = item['DestPath']
+            crystal_ligand_path =item['crystal_destpath']
+
+        if not docked_ligand_overlaps_with_crystal(docked_ligand_path,crystal_ligand_path):
+            self.PDB_2_npy(docked_ligand_path,coded,is_receptor=False)
+
+
+    def process_PDB_to_npy(self,dataframe,coded):
+        if coded:
+            sourcePath = os.path.join(self.kaggleBasePath,'unlabeled_pdb')
+        else:
+            sourcePath = os.path.join(self.kaggleBasePath,'labeled_pdb')
+
+        edge = np.linspace(0,len(dataframe),self.process_num+1)
+        process_list = [ multiprocessing.Process(target=self.process_convert,
+                                                 args=(self.clashdetect,
+                                                       dataframe,
+                                                       coded,
+                                                       range(edge[i],
+                                                             edge[i+1])))
+                         for i in range(self.process_num)]
+
+        for p in process_list:
+            print "process start: ",p
+            p.start()
+
+
+        if coded:
+            for sourceFilePath in path_iterator(os.walk(os.path.join(sourcePath,self.receptorFolderName))):
+                self.PDB_2_npy(sourceFilePath,coded,is_receptor=True)
+
+        else:
+            for sourceFilePath in path_iterator(os.walk(os.path.join(sourcePath,self.receptorFolderName))):
+                self.PDB_2_npy(sourceFilePath,coded,is_receptor=True)
+
+            for sourceFilePath in path_iterator(os.walk(os.path.join(sourcePath,self.crystalFolderName))):
+                self.PDB_2_npy(sourceFilePath,coded,is_receptor=False)
+
+
+
+
+        for p in process_list:
+            p.join()
+
+
+
+
 
 
 if __name__ == '__main__':

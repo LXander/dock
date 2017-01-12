@@ -154,7 +154,7 @@ class kaggleDataset:
             dest_file_path = item['DestPath']
         Id = item['FrameId']
 
-        cmd = 'obabel -ipdb %s -f %s -opdb -O %s'.format(source_file_path,Id,Id,dest_file_path)
+        cmd = 'obabel -ipdb {} -f {} -l {} -opdb -O {}'.format(source_file_path,Id,Id,dest_file_path)
 
         create_chain_parent_folder(dest_file_path)
         if not os.path.exists(dest_file_path):
@@ -162,10 +162,20 @@ class kaggleDataset:
 
     def thread_convert(self,func,dataframe,coded,index):
         for i in index:
-            func(dataframe[i],coded)
+            #print "dataframe size: {}, ix {}".format(len(dataframe),i)
+            func(dataframe.iloc[i],coded)
 
     def process_convert(self,func,dataframe,coded,index):
-        edge = np.linspace(0,len(index),self.thread_num+1).astype(int)
+        # linspace contain end value but range don't
+        # so we use edge[i+1] to select value in index
+        # end should be len(index)-1
+        edge = np.linspace(0,len(index)-1,self.thread_num+1).astype(int)
+        #print 'index size ',len(index)
+        #print 'edge size ',len(edge)
+        #print edge
+        #print range(self.thread_num)
+        #for i in range(self.thread_num):
+        #    print i,index[edge[i]],index[edge[i+1]]        
         thread_list = [ threading.Thread(target=self.thread_convert,
                                          args=(func,
                                                dataframe,

@@ -165,7 +165,7 @@ class kaggleDataset:
             func(dataframe[i],coded)
 
     def process_convert(self,func,dataframe,coded,index):
-        edge = np.linspace(0,len(index),self.thread_num+1)
+        edge = np.linspace(0,len(index),self.thread_num+1).astype(int)
         thread_list = [ threading.Thread(target=self.thread_convert,
                                          args=(func,
                                                dataframe,
@@ -198,7 +198,7 @@ class kaggleDataset:
             except Exception as e:
                 print e
 
-        edge = np.linspace(0,len(dataframe),self.process_num+1)
+        edge = np.linspace(0,len(dataframe),self.process_num+1).astype(int)
         process_list = [ multiprocessing.Process(target=self.process_convert,
                                                  args=(self.entry_convert,
                                                        dataframe,
@@ -482,7 +482,7 @@ class kaggleDataset:
         else:
             sourcePath = os.path.join(self.kaggleBasePath,'labeled_pdb')
 
-        edge = np.linspace(0,len(dataframe),self.process_num+1)
+        edge = np.linspace(0,len(dataframe),self.process_num+1).astype(int)
         process_list = [ multiprocessing.Process(target=self.process_convert,
                                                  args=(self.clashdetect,
                                                        dataframe,
@@ -517,5 +517,6 @@ class kaggleDataset:
 
 if __name__ == '__main__':
     kaggle = kaggleDataset('jan_11')
-    kaggle.database_from_csv('/home/xl198/remark/dec_17_small.csv')
+    #kaggle.database_from_csv('/home/xl198/remark/dec_17_small.csv')
+    kaggle.convert('/n/scratch2/xl198/data/jan_11/temp/train_set.csv')
 

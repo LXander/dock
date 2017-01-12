@@ -331,22 +331,6 @@ class kaggleDataset:
         crystalLigands = list(set(zip(testset['PDBname'],testset['RES'])))
         receptorAndCrystal = pd.DataFrame(data=crystalLigands, columns=['PDBname','RES'])
 
-        receptorAndCrystal['receptor_sourcepath'] = receptorAndCrystal.apply(
-            lambda item: os.path.join(self.receptor_base,
-                                      item['PDBname'],
-                                      item['PDBname'] + '.pdb'),
-            axis=1
-        )
-
-
-        receptorAndCrystal['crystal_sourcepath'] = receptorAndCrystal.apply(
-            lambda item: os.path.join(self.crystal_base,
-                                      item['PDBname'],
-                                      '_'.join([item['PDBname'],
-                                               item['RES'],
-                                               'ligand.pdb'])),
-            axis=1
-        )
 
 
         if coded:
@@ -362,10 +346,13 @@ class kaggleDataset:
             receptorAndCrystal['crystal_code']  = code[len(receptorAndCrystal):len(receptorAndCrystal)*2]
             testset['ligand_code']              = code[len(receptorAndCrystal)*2:]
 
+            testset = testset.merge(receptorAndCrystal,on=['PDBname','RES'])
+
             testset['code_destpath'] = testset.apply(
                 lambda item:os.path.join(self.kaggleBasePath,
                                          "unlabeled_pdb",
                                          "ligands",
+                                         'P'+str(item['receptor_code']),
                                          'L'+str(item['ligand_code'])+'.pdb'),
                 axis=1
             )
@@ -388,9 +375,26 @@ class kaggleDataset:
                 lambda item:os.path.join(self.kaggleBasePath,
                                          "unlabeled_pdb",
                                          "ligands",
+                                         'P'+str(item['receptor_code']),
                                          'L'+str(item['crystal_code'])+'.pdb'),
                 axis=1
             )
+
+        receptorAndCrystal['receptor_sourcepath'] = receptorAndCrystal.apply(
+            lambda item: os.path.join(self.receptor_base,
+                                      item['PDBname'],
+                                      item['PDBname'] + '.pdb'),
+            axis=1
+        )
+
+        receptorAndCrystal['crystal_sourcepath'] = receptorAndCrystal.apply(
+            lambda item: os.path.join(self.crystal_base,
+                                      item['PDBname'],
+                                      '_'.join([item['PDBname'],
+                                                item['RES'],
+                                                'ligand.pdb'])),
+            axis=1
+        )
 
 
         print "test set -------------------------------------"

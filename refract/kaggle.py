@@ -182,6 +182,22 @@ class kaggleDataset:
             t.join()
 
     def convert(self,dataframe,coded=False):
+        '''
+        according the result of 'database_from_csv' get splited pdb file
+        and put them in to dest directory
+
+        :param dataframe: pandas.DataFrame
+                          string
+        :param coded: bool
+        :return:
+        '''
+
+        if type(dataframe) == str:
+            try:
+                dataframe = pd.read_csv(dataframe)
+            except Exception as e:
+                print e
+
         edge = np.linspace(0,len(dataframe),self.process_num+1)
         process_list = [ multiprocessing.Process(target=self.process_convert,
                                                  args=(self.entry_convert,
@@ -438,6 +454,29 @@ class kaggleDataset:
             self.PDB_2_npy(docked_ligand_path,coded,is_receptor=False)
 
     def process_PDB_to_npy(self,dataframe,coded):
+        '''
+        convert pdb data in /labeled_pdb and /unlabeled_pdb into npy form
+        /labeled_npy and /unlabeled_npy
+
+
+        directly convert /receptors , /crystal_ligands and /ligands into npy
+        /docked_ligands need to remove the overlap result first
+
+
+        :param dataframe: pandas.DataFrame : dataframe contain docked ligand
+                                            and corresponding crystal ligand path
+                          string : path of csv file
+        :param coded: bool, if the result is coded
+        :return:
+        '''
+
+        if type(dataframe) == str:
+            try:
+                dataframe = pd.read_csv(dataframe)
+            except Exception as e:
+                print e
+
+
         if coded:
             sourcePath = os.path.join(self.kaggleBasePath,'unlabeled_pdb')
         else:
@@ -479,3 +518,4 @@ class kaggleDataset:
 if __name__ == '__main__':
     kaggle = kaggleDataset('jan_11')
     kaggle.database_from_csv('/home/xl198/remark/dec_17_small.csv')
+

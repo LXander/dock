@@ -195,10 +195,10 @@ class kaggleDataset:
         trainset['SourcePath'] = trainset.apply(
             lambda item: os.path.join(self.source_base,
                                       item['PDBname'],
-                                      '_'.join(item['PDBname'],
+                                      '_'.join([item['PDBname'],
                                                item['RES'],
                                                'ligand',
-                                               'fast.pdb')),
+                                               'fast.pdb'])),
             axis=1
         )
 
@@ -207,11 +207,11 @@ class kaggleDataset:
                                       "labeled_pdb",
                                       self.ligandFolderName,
                                       item['PDBname'],
-                                      '_'.join(item['PDBname'],
+                                      '_'.join([item['PDBname'],
                                                item['RES'],
                                                'ligand',
                                                'fast',
-                                               item['FrameId'] + '.pdb')),
+                                               item['FrameId'] + '.pdb'])),
             asix=1
         )
 
@@ -236,9 +236,9 @@ class kaggleDataset:
         receptorAndCrystal['crystal_sourcepath'] = receptorAndCrystal.apply(
             lambda item: os.path.join(self.crystal_base,
                                       receptorAndCrystal['PDBname'],
-                                      '_'.join(receptorAndCrystal['PDBname'],
+                                      '_'.join([receptorAndCrystal['PDBname'],
                                                receptorAndCrystal['RES'],
-                                               'ligand.pdb')),
+                                               'ligand.pdb'])),
             axis=1
         )
 
@@ -247,9 +247,9 @@ class kaggleDataset:
                                       "labeled_pdb",
                                       self.crystalFolderName,
                                       item['PDBname'],
-                                      '_'.join(item['PDBname'],
+                                      '_'.join([item['PDBname'],
                                                item['RES'],
-                                               'ligand.pdb'))
+                                               'ligand.pdb']))
         )
 
         return trainset,receptorAndCrystal
@@ -264,10 +264,10 @@ class kaggleDataset:
         testset['SourcePath'] = testset.apply(
             lambda item: os.path.join(self.source_base,
                                       item['PDBname'],
-                                      '_'.join(item['PDBname'],
+                                      '_'.join([item['PDBname'],
                                                item['RES'],
                                                'ligand',
-                                               'fast.pdb')),
+                                               'fast.pdb'])),
             axis=1
         )
 
@@ -276,11 +276,11 @@ class kaggleDataset:
                                       "unlabeled_pdb",
                                       "ligands",
                                       item["PDBname"],
-                                      '_'.join(item['PDBname'],
+                                      '_'.join([item['PDBname'],
                                                item['RES'],
                                                'ligand',
                                                'fast',
-                                               item['FrameId'] + '.pdb')),
+                                               item['FrameId'] + '.pdb'])),
             axis=1
         )
 
@@ -298,9 +298,9 @@ class kaggleDataset:
         receptorAndCrystal['crystal_sourcepath'] = receptorAndCrystal.apply(
             lambda item: os.path.join(self.crystal_base,
                                       receptorAndCrystal['PDBname'],
-                                      '_'.join(receptorAndCrystal['PDBname'],
+                                      '_'.join([receptorAndCrystal['PDBname'],
                                                receptorAndCrystal['RES'],
-                                               'ligand.pdb')),
+                                               'ligand.pdb'])),
             axis=1
         )
 

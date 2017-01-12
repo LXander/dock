@@ -90,7 +90,7 @@ class kaggleDataset:
 
         df = pd.read_csv(sourceCsv)
         # select the port that we needed to reduce dataframe size.
-        df = df[['PBDname','PDBResId']]
+        df = df[['PDBname','PDBResId']]
         df['RES'] = df['PDBResId'].apply(lambda x:x.split('_')[0])
         df['FrameId'] = df['PDBResId'].apply(lambda x:x.split('_')[1])
 

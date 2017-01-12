@@ -30,8 +30,8 @@ class kaggleDataset:
     ligandFolderName   = 'docked_ligands'
     crystalFolderName  = 'crystal_ligands'
     receptorFolderName = 'receptors'
-    thread_num = 2
-    process_num = 2
+    thread_num = 16
+    process_num = 12
 
     def __init__(self,folerName):
         self.basePath = os.path.join(self.workplace,folerName)
@@ -533,9 +533,9 @@ class kaggleDataset:
 
 if __name__ == '__main__':
     kaggle = kaggleDataset('jan_11')
-    #kaggle.database_from_csv('/home/xl198/remark/dec_17_small.csv')
-    #kaggle.convert('/n/scratch2/xl198/data/jan_11/temp/train_set.csv')
-    #kaggle.convert('/n/scratch2/xl198/data/jan_11/temp/train_receptor_crystal.csv',is_docked=False)
+    kaggle.database_from_csv('/home/xl198/remark/dec_17_small.csv')
+    kaggle.convert('/n/scratch2/xl198/data/jan_11/temp/train_set.csv')
+    kaggle.convert('/n/scratch2/xl198/data/jan_11/temp/train_receptor_crystal.csv',is_docked=False)
     kaggle.convert('/n/scratch2/xl198/data/jan_11/temp/test_set.csv',coded=True)
-    #kaggle.convert('/n/scratch2/xl198/data/jan_11/temp/test_receptor_crystal.csv',coded=True,is_docked=True)
+    kaggle.convert('/n/scratch2/xl198/data/jan_11/temp/test_receptor_crystal.csv',coded=True,is_docked=True)
 

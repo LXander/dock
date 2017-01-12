@@ -270,7 +270,7 @@ class kaggleDataset:
 
         return trainset,receptorAndCrystal
 
-    def code_test_set(self,testset,coded=False):
+    def code_test_set(self,testset,coded=True):
         '''
         code the test set into random number label, and mix crystal ligands inside
         :param testset: pandas.DataFrame test_set
@@ -365,7 +365,10 @@ class kaggleDataset:
             )
 
 
-        docked_dest= testset[['PDBname','RES','coded_destpath']]
+        print "test set -------------------------------------"
+        print testset.columns
+
+        docked_dest= testset[['PDBname','RES','code_destpath']]
         crystal_dest = receptorAndCrystal[['PDBname','RES','code_crystal_destpath']]
         docked_crystal_pair = docked_dest.merge(crystal_dest,on=['PDBname','RES'])
         self.write_dataframe(docked_crystal_pair,'test_docked_crystal_pair')
@@ -434,7 +437,6 @@ class kaggleDataset:
         if not docked_ligand_overlaps_with_crystal(docked_ligand_path,crystal_ligand_path):
             self.PDB_2_npy(docked_ligand_path,coded,is_receptor=False)
 
-
     def process_PDB_to_npy(self,dataframe,coded):
         if coded:
             sourcePath = os.path.join(self.kaggleBasePath,'unlabeled_pdb')
@@ -471,9 +473,6 @@ class kaggleDataset:
 
         for p in process_list:
             p.join()
-
-
-
 
 
 

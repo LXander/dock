@@ -145,7 +145,7 @@ class kaggleDataset:
         receptor_source_file_path   = item['receptor_sourcepath']
         crystal_source_file_path    = item['crystal_sourcepath']
         if coded:
-            receptor_dest_file_path = item['code_crystal_destpath']
+            receptor_dest_file_path = item['code_receptor_destpath']
             crystal_dest_file_path  = item['code_crystal_destpath']
         else:
             receptor_dest_file_path = item['receptor_destpath']
@@ -153,7 +153,8 @@ class kaggleDataset:
 
         crystal_cmd = "cp {} {}".format(crystal_source_file_path, crystal_dest_file_path)
         receptor_cmd = "cp {} {}".format(receptor_source_file_path,receptor_dest_file_path)
-
+        print crystal_cmd
+        print receptor_cmd
         create_chain_parent_folder(crystal_dest_file_path)
         create_chain_parent_folder(receptor_dest_file_path)
 
@@ -379,7 +380,7 @@ class kaggleDataset:
 
             receptorAndCrystal['code_receptor_destpath'] = receptorAndCrystal.apply(
                 lambda item:os.path.join(self.kaggleBasePath,
-                                         "unlabeledd_pdb",
+                                         "unlabeled_pdb",
                                          "receptors",
                                          'P'+str(item['receptor_code'])+'.pdb'),
                 axis = 1
@@ -550,9 +551,9 @@ class kaggleDataset:
 
 if __name__ == '__main__':
     kaggle = kaggleDataset('jan_11')
-    kaggle.database_from_csv('/home/xl198/remark/dec_17_small.csv')
-    kaggle.convert('/n/scratch2/xl198/data/jan_11/temp/train_set.csv')
-    kaggle.convert('/n/scratch2/xl198/data/jan_11/temp/train_receptor_crystal.csv',is_docked=False)
-    kaggle.convert('/n/scratch2/xl198/data/jan_11/temp/test_set.csv',coded=True)
-    kaggle.convert('/n/scratch2/xl198/data/jan_11/temp/test_receptor_crystal.csv',coded=True,is_docked=True)
+    #kaggle.database_from_csv('/home/xl198/remark/dec_17_small.csv')
+    #kaggle.convert('/n/scratch2/xl198/data/jan_11/temp/train_set.csv')
+    #kaggle.convert('/n/scratch2/xl198/data/jan_11/temp/train_receptor_crystal.csv',is_docked=False)
+    #kaggle.convert('/n/scratch2/xl198/data/jan_11/temp/test_set.csv',coded=True)
+    kaggle.convert('/n/scratch2/xl198/data/jan_11/temp/test_receptor_crystal.csv',coded=True,is_docked=False)
 

@@ -109,30 +109,40 @@ class kaggleDataset:
 
     def database_from_csv(self,sourceCsv):
         '''
+        parse database from csv file, each entry of database
+        should have columns [PDBname] and [PDBResId]
+        PDBname is the name of receptor e.g. 1ab3
+        PDBResId is the combinate of Res number and Frame Id e.g. 1234_1
+        file name can be derived by these value.
 
-        :param sourceCsv:
+
+
+        :param sourceCsv: path of csv file
         :return:
         '''
 
         df = pd.read_csv(sourceCsv)
-        # select the port that we needed to reduce dataframe size.
+
+        # select the part that we need to reduce dataframe size.
         df = df[['PDBname','PDBResId']]
         df['RES'] = df['PDBResId'].apply(lambda x:x.split('_')[0])
         df['FrameId'] = df['PDBResId'].apply(lambda x:x.split('_')[1])
 
+        # devided dataset into train set and test set
         trainset,testset = self.divide_by_PDBname(df,testset_ratio=0.1)
-
         trainset = trainset.merge(df)
         testset  = testset.merge(df)
 
 
-        #self.write_dataframe(trainset,'train_set')
-        #self.write_dataframe(testset,'test_set')
-
+        # generate source file path and dest filepath
+        # for receptor and crystal ligands we dont have a individual entry
+        # in dataframe so we generate another dataframe for them
         train_set,train_receptor_crystal = self.train_set(trainset)
 
-        test_set,test_receptor_crystal = self.code_test_set(testset,True)
+        # for test set we will code all the ligand and receptor
+        test_set,test_receptor_crystal = self.code_test_set(testset,coded= True)
 
+        # write down all the dataframe into temp folder
         self.write_dataframe(train_set,'train_set')
         self.write_dataframe(test_set,'test_set')
         self.write_dataframe(train_receptor_crystal,'train_receptor_crystal')
@@ -141,7 +151,15 @@ class kaggleDataset:
         #self.write_dataframe(coded_testset,'coded_testset')
 
     def receptor_crystal_convert(self,item,coded):
-        #print item
+        '''
+        get receptor and crystal ligand to dest folder
+
+
+        :param item: row of dataframe
+        :param coded: bool
+        :return:
+        '''
+
         receptor_source_file_path   = item['receptor_sourcepath']
         crystal_source_file_path    = item['crystal_sourcepath']
         if coded:
@@ -151,10 +169,11 @@ class kaggleDataset:
             receptor_dest_file_path = item['receptor_destpath']
             crystal_dest_file_path  = item['crystal_destpath']
 
+
+        # copying them from source to dest
         crystal_cmd = "cp {} {}".format(crystal_source_file_path, crystal_dest_file_path)
         receptor_cmd = "cp {} {}".format(receptor_source_file_path,receptor_dest_file_path)
-        print crystal_cmd
-        print receptor_cmd
+
         create_chain_parent_folder(crystal_dest_file_path)
         create_chain_parent_folder(receptor_dest_file_path)
 
@@ -164,13 +183,21 @@ class kaggleDataset:
             os.popen(receptor_cmd)
 
     def entry_convert(self,item,coded):
+        '''
+        original pdb file contains multiple frames
+        use obabel for select one frame from it
 
+        :param item: row of dataframe
+        :param coded: bool
+        :return:
+        '''
         source_file_path = item["SourcePath"]
         if coded:
             dest_file_path = item['code_destpath']
         else:
             dest_file_path = item['DestPath']
         Id = item['FrameId']
+
 
         cmd = 'obabel -ipdb {} -f {} -l {} -opdb -O {}'.format(source_file_path,Id,Id,dest_file_path)
 
@@ -179,21 +206,25 @@ class kaggleDataset:
             os.popen(cmd)
 
     def thread_convert(self,func,dataframe,coded,index):
+        '''
+        job running in thread
+        :param func: function running in single thread
+        :param dataframe: pandas.DataFrame
+        :param coded: bool
+        :param index: list of int
+        :return:
+        '''
         for i in index:
             #print "dataframe size: {}, ix {}".format(len(dataframe),i)
             func(dataframe.iloc[i],coded)
 
     def process_convert(self,func,dataframe,coded,index):
+
         # linspace contain end value but range don't
         # so we use edge[i+1] to select value in index
         # end should be len(index)-1
         edge = np.linspace(0,len(index)-1,self.thread_num+1).astype(int)
-        #print 'index size ',len(index)
-        #print 'edge size ',len(edge)
-        #print edge
-        #print range(self.thread_num)
-        #for i in range(self.thread_num):
-        #    print i,index[edge[i]],index[edge[i+1]]        
+
         thread_list = [ threading.Thread(target=self.thread_convert,
                                          args=(func,
                                                dataframe,
@@ -211,8 +242,8 @@ class kaggleDataset:
 
     def convert(self,dataframe,coded=False,is_docked=True):
         '''
-        according the result of 'database_from_csv' get splited pdb file
-        and put them in to dest directory
+        according the result of 'database_from_csv'
+        running multiprocess to get result
 
         :param dataframe: pandas.DataFrame
                           string
@@ -220,8 +251,10 @@ class kaggleDataset:
         :return:
         '''
 
+
         convert_func = self.entry_convert if is_docked else self.receptor_crystal_convert
 
+        # if get a str, read csv
         if type(dataframe) == str:
             try:
                 dataframe = pd.read_csv(dataframe)
@@ -272,8 +305,7 @@ class kaggleDataset:
 
         crystalLigands = list(set(zip(trainset['PDBname'], trainset['RES'])))
         receptorAndCrystal = pd.DataFrame(data=crystalLigands, columns=['PDBname', 'RES'])
-        print "Train set receptro and crystal"
-        print receptorAndCrystal.columns
+
         receptorAndCrystal['receptor_sourcepath'] = receptorAndCrystal.apply(
             lambda item: os.path.join(self.receptor_base,
                                       item['PDBname'],
@@ -452,6 +484,13 @@ class kaggleDataset:
         return train,test
 
     def PDB_2_npy(self,sourceFilePath,coded,is_receptor):
+        '''
+        convert pdb into npy, only need atom coordinate and atom type
+        :param sourceFilePath:
+        :param coded: if file coded
+        :param is_receptor:
+        :return:
+        '''
         atom_dict = atom_dictionary.REC if is_receptor else atom_dictionary.LIG
 
         if coded:
@@ -477,6 +516,13 @@ class kaggleDataset:
             print
 
     def clashdetact(self,item,coded):
+        '''
+        if docked ligand doesn't overlap with crystal ligand
+        convert docked ligand into npy format
+        :param item: row of dataframe
+        :param coded: bool
+        :return:
+        '''
         if coded:
             docked_ligand_path = item['coded_destpath']
             crystal_ligand_path = item['code_crystal_destpath']
@@ -551,9 +597,10 @@ class kaggleDataset:
 
 if __name__ == '__main__':
     kaggle = kaggleDataset('jan_11')
-    #kaggle.database_from_csv('/home/xl198/remark/dec_17_small.csv')
-    #kaggle.convert('/n/scratch2/xl198/data/jan_11/temp/train_set.csv')
-    #kaggle.convert('/n/scratch2/xl198/data/jan_11/temp/train_receptor_crystal.csv',is_docked=False)
-    #kaggle.convert('/n/scratch2/xl198/data/jan_11/temp/test_set.csv',coded=True)
+    kaggle.database_from_csv('/home/xl198/remark/dec_17_small.csv')
+    kaggle.convert('/n/scratch2/xl198/data/jan_11/temp/train_set.csv')
+    kaggle.convert('/n/scratch2/xl198/data/jan_11/temp/train_receptor_crystal.csv',is_docked=False)
+    kaggle.convert('/n/scratch2/xl198/data/jan_11/temp/test_set.csv',coded=True)
     kaggle.convert('/n/scratch2/xl198/data/jan_11/temp/test_receptor_crystal.csv',coded=True,is_docked=False)
+
 

@@ -34,6 +34,12 @@ class kaggleDataset:
     process_num = 12
 
     def __init__(self,folerName):
+        '''
+        Create folder for kaggle dataset
+        tempFolderPath used to store intermediate csv file
+        kaggleBasePath used to store converted and coded data
+        :param folerName:
+        '''
         self.basePath = os.path.join(self.workplace,folerName)
 
         self.tempFolderPath = os.path.join(self.basePath,'temp')
@@ -54,6 +60,12 @@ class kaggleDataset:
         dataframe.to_csv(os.path.join(self.tempFolderPath,filename+'.csv'),index=False)
 
     def generate_database_index(self,dataBasePath):
+        '''
+        build database index by scan a folder
+        and save index file
+        :param dataBasePath:
+        :return: pandas.DataFrame
+        '''
 
         ligandsFolderPath  = os.path.join(dataBasePath,self.ligandFolderName)
         crystalFolderPath  = os.path.join(dataBasePath,self.crystalFolderName)
@@ -96,6 +108,11 @@ class kaggleDataset:
         return dataBase
 
     def database_from_csv(self,sourceCsv):
+        '''
+
+        :param sourceCsv:
+        :return:
+        '''
 
         df = pd.read_csv(sourceCsv)
         # select the port that we needed to reduce dataframe size.

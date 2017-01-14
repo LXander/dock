@@ -31,7 +31,7 @@ class kaggleDataset:
     crystalFolderName  = 'crystal_ligands'
     receptorFolderName = 'receptors'
     thread_num = 16
-    process_num = 64
+    process_num = 128
 
     def __init__(self,folerName):
         '''
@@ -510,12 +510,12 @@ class kaggleDataset:
                                prody_ligand.getElements())
             coordinates_and_atoms = np.hstack((prody_ligand.getCoords(),
                                                np.reshape(atom_numbers, (-1, 1))))
-
+            create_chain_parent_folder(destFilePath)
             np.save(destFilePath,coordinates_and_atoms)
         except Exception as e:
             print
 
-    def clashdetact(self,item,coded):
+    def clashdetect(self,item,coded):
         '''
         if docked ligand doesn't overlap with crystal ligand
         convert docked ligand into npy format
@@ -524,10 +524,10 @@ class kaggleDataset:
         :return:
         '''
         if coded:
-            docked_ligand_path = item['coded_destpath']
+            docked_ligand_path = item['code_destpath']
             crystal_ligand_path = item['code_crystal_destpath']
         else:
-            doced_ligand_path = item['DestPath']
+            docked_ligand_path = item['DestPath']
             crystal_ligand_path =item['crystal_destpath']
 
         if not docked_ligand_overlaps_with_crystal(docked_ligand_path,crystal_ligand_path):
@@ -605,7 +605,7 @@ def get_pdb():
 
 if __name__ == '__main__':
     kaggle = kaggleDataset('jan_13')
-    # kaggle.process_PDB_to_npy('/n/scratch2/xl198/data/jan_13/temp/train_docked_crystal_pair.csv',coded=False)
+    kaggle.process_PDB_to_npy('/n/scratch2/xl198/data/jan_13/temp/train_docked_crystal_pair.csv',coded=False)
     kaggle.process_PDB_to_npy('/n/scratch2/xl198/data/jan_13/temp/test_docked_crystal_pair.csv', coded=True)
 
 

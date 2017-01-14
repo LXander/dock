@@ -594,13 +594,20 @@ class kaggleDataset:
             p.join()
 
 
-
-if __name__ == '__main__':
+def get_pdb():
     kaggle = kaggleDataset('jan_13')
     kaggle.database_from_csv('/home/xl198/remark/dec_17_small.csv')
     kaggle.convert('train_set.csv')
-    kaggle.convert('train_receptor_crystal.csv',is_docked=False)
-    kaggle.convert('test_set.csv',coded=True)
-    kaggle.convert('test_receptor_crystal.csv',coded=True,is_docked=False)
+    kaggle.convert('train_receptor_crystal.csv', is_docked=False)
+    kaggle.convert('test_set.csv', coded=True)
+    kaggle.convert('test_receptor_crystal.csv', coded=True, is_docked=False)
+
+
+if __name__ == '__main__':
+    kaggle = kaggleDataset('jan_13')
+    # kaggle.process_PDB_to_npy('/n/scratch2/xl198/data/jan_13/temp/train_docked_crystal_pair.csv',coded=False)
+    kaggle.process_PDB_to_npy('/n/scratch2/xl198/data/jan_13/temp/test_docked_crystal_pair.csv', coded=True)
+
+
 
 

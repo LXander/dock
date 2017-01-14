@@ -31,7 +31,7 @@ class kaggleDataset:
     crystalFolderName  = 'crystal_ligands'
     receptorFolderName = 'receptors'
     thread_num = 16
-    process_num = 12
+    process_num = 64
 
     def __init__(self,folerName):
         '''
@@ -257,7 +257,7 @@ class kaggleDataset:
         # if get a str, read csv
         if type(dataframe) == str:
             try:
-                dataframe = pd.read_csv(dataframe)
+                dataframe = pd.read_csv(os.path.join(self.tempFolderPath,dataframe))
             except Exception as e:
                 print e
 
@@ -596,11 +596,11 @@ class kaggleDataset:
 
 
 if __name__ == '__main__':
-    kaggle = kaggleDataset('jan_11')
+    kaggle = kaggleDataset('jan_13')
     kaggle.database_from_csv('/home/xl198/remark/dec_17_small.csv')
-    kaggle.convert('/n/scratch2/xl198/data/jan_11/temp/train_set.csv')
-    kaggle.convert('/n/scratch2/xl198/data/jan_11/temp/train_receptor_crystal.csv',is_docked=False)
-    kaggle.convert('/n/scratch2/xl198/data/jan_11/temp/test_set.csv',coded=True)
-    kaggle.convert('/n/scratch2/xl198/data/jan_11/temp/test_receptor_crystal.csv',coded=True,is_docked=False)
+    kaggle.convert('train_set.csv')
+    kaggle.convert('train_receptor_crystal.csv',is_docked=False)
+    kaggle.convert('test_set.csv',coded=True)
+    kaggle.convert('test_receptor_crystal.csv',coded=True,is_docked=False)
 
 

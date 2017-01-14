@@ -8,7 +8,7 @@ import re
 
 sourceBase = '/n/scratch2/xl198/dude/data/all'
 destBase = '/n/scratch2/xl198/dude/data/dude/pdbs'
-dockingIndex = '/n/scratch2/xl198/dude/code/crystal.csv'
+dockingIndex = '/n/scratch2/xl198/dude/code/dude.csv'
 smina = '/home/xl198/program/smina/smina.static'
 
 def createFolder(folderPath):
@@ -85,22 +85,25 @@ def docking():
     pass
 
 def docking_offset(offset):
+    print "docking ",offset
     df = pd.read_csv(dockingIndex)
     remain = []
     if offset:
         index = range(offset,len(df)+1,1000)
     else:
         index = range(1,len(df)+1)
+    print "index size ",len(index)
+    
     for i in index:
         receptor, ligand, ligand_box, output = df.ix[i-1]
         command = "{} -r {} -l {} --autobox_ligand {} -o {} --num_modes=1000 --energy_range=100 --cpu=1 " \
             .format(smina, receptor, ligand, ligand_box, output)
         createFolder(os.path.dirname(output))
-
+        print "dock..."
         if not os.path.exists(output):
             if offset:
-                #os.popen(command)
-                print command
+                os.popen(command)
+                #print command
             else:
                 remain.append([receptor,ligand,ligand_box,output])
 

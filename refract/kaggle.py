@@ -35,7 +35,7 @@ class kaggleDataset:
     crystalFolderName  = 'crystal_ligands'
     receptorFolderName = 'receptors'
     thread_num = 16
-    process_num = 128
+    process_num = 12
 
     def __init__(self,folerName):
         '''
@@ -563,8 +563,8 @@ class kaggleDataset:
             except Exception as e:
                 print e
 
-        if hasattr(FLAGS,'cores_num'):
-            self.process_num = FLAGS.cores_num
+        if hasattr(FLAGS,'cores'):
+            self.process_num = FLAGS.cores
 
         print "running in {} processors".format(self.process_num)
 
@@ -573,7 +573,7 @@ class kaggleDataset:
             jobid = FLAGS.orchestra_jobid
 
             # using iloc to slice dataframe result doesn't contains end [start,end)
-            linspace = np.linspace(0,len(dataframe),jobsize+1)
+            linspace = np.linspace(0,len(dataframe),jobsize+1).astype(int)
             dataframe = dataframe.iloc[linspace[jobid-1]:linspace[jobid]]
 
         print "dataframe size ",len(dataframe)
@@ -597,7 +597,7 @@ class kaggleDataset:
             print "process start: ",p
             p.start()
 
-
+        '''
         if coded:
             for sourceFilePath in path_iterator(os.walk(os.path.join(sourcePath,self.receptorFolderName))):
                 self.PDB_2_npy(sourceFilePath,coded,is_receptor=True)
@@ -608,7 +608,7 @@ class kaggleDataset:
 
             for sourceFilePath in path_iterator(os.walk(os.path.join(sourcePath,self.crystalFolderName))):
                 self.PDB_2_npy(sourceFilePath,coded,is_receptor=False)
-
+	'''
 
 
 
@@ -629,21 +629,21 @@ def parse_FLAG():
 
     for name,value in opts:
         if name == '--jobsize':
-            FLAGS.orchestra_jobsize = value
+            FLAGS.orchestra_jobsize = int(value)
             print "--jobsize ",value
         if name == '--jobid':
-            FLAGS.orchestra_jobid = value
+            FLAGS.orchestra_jobid = int(value)
             print "--jobid", value
         if name == '--cores':
-            FLAGS.cores_num = value
+            FLAGS.cores = int(value)
 
     if hasattr(FLAGS,"orchestra_jobsize") and hasattr(FLAGS,"orchestra_jobid"):
         FLAGS.orchestra_arrayjob = True
 
     print "orchestra job ",FLAGS.orchestra_arrayjob
 
-    if hasattr(FLAGS,'cores_num'):
-        print "cores num ",FLAGS.cores_num
+    if hasattr(FLAGS,'cores'):
+        print "cores num ",FLAGS.cores
 
 def get_pdb():
     kaggle = kaggleDataset('jan_13')

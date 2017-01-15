@@ -214,7 +214,7 @@ class kaggleDataset:
         :param index: list of int
         :return:
         '''
-        for i in index:
+        for i in index[::-1]:
             #print "dataframe size: {}, ix {}".format(len(dataframe),i)
             func(dataframe.iloc[i],coded)
 
@@ -513,7 +513,7 @@ class kaggleDataset:
             create_chain_parent_folder(destFilePath)
             np.save(destFilePath,coordinates_and_atoms)
         except Exception as e:
-            print
+            print e
 
     def clashdetect(self,item,coded):
         '''
@@ -529,9 +529,12 @@ class kaggleDataset:
         else:
             docked_ligand_path = item['DestPath']
             crystal_ligand_path =item['crystal_destpath']
-
-        if not docked_ligand_overlaps_with_crystal(docked_ligand_path,crystal_ligand_path):
-            self.PDB_2_npy(docked_ligand_path,coded,is_receptor=False)
+        if os.path.exists(docked_ligand_path) and os.path.exists(docked_ligand_path):
+            if not docked_ligand_overlaps_with_crystal(docked_ligand_path,crystal_ligand_path):
+                try:
+                    self.PDB_2_npy(docked_ligand_path,coded,is_receptor=False)
+                except:
+                    pass
 
     def process_PDB_to_npy(self,dataframe,coded):
         '''

@@ -11,6 +11,7 @@ import threading
 from itertools import chain
 import prody
 from av2_atomdict import atom_dictionary
+import getopt
 
 #############################
 #
@@ -21,6 +22,9 @@ from av2_atomdict import atom_dictionary
 #
 #
 #############################
+
+class FLAGS:
+    orchestra_arrayjob = False
 
 class kaggleDataset:
     source_base = '/n/scratch2/xl198/data/pdbs'
@@ -234,7 +238,7 @@ class kaggleDataset:
                         for i in range(self.thread_num) ]
 
         for t in thread_list:
-            print "thread start: ",t
+            #print "thread start: ",t
             t.start()
 
         for t in thread_list:
@@ -271,7 +275,7 @@ class kaggleDataset:
                          for i in range(self.process_num)]
 
         for p in process_list:
-            print "process start: ",p
+            #print "process start: ",p
             p.start()
 
         for p in process_list:
@@ -559,6 +563,21 @@ class kaggleDataset:
             except Exception as e:
                 print e
 
+        if hasattr(FLAGS,'cores_num'):
+            self.process_num = FLAGS.cores_num
+
+        print "running in {} processors".format(self.process_num)
+
+        if FLAGS.orchestra_arrayjob:
+            jobsize = FLAGS.orchestra_jobsize
+            jobid = FLAGS.orchestra_jobid
+
+            # using iloc to slice dataframe result doesn't contains end [start,end)
+            linspace = np.linspace(0,len(dataframe),jobsize+1)
+            dataframe = dataframe.iloc[linspace[jobid-1]:linspace[jobid]]
+
+        print "dataframe size ",len(dataframe)
+
 
         if coded:
             sourcePath = os.path.join(self.kaggleBasePath,'unlabeled_pdb')
@@ -597,6 +616,35 @@ class kaggleDataset:
             p.join()
 
 
+
+
+def parse_FLAG():
+    try:
+        opts,args = getopt.getopt(sys.argv[1:],None,["jobsize=","jobid=","cores="])
+    except getopt.GetoptError as err:
+        # print help information and exit:
+        print str(err)  # will print something like "option -a not recognized"
+
+        sys.exit(2)
+
+    for name,value in opts:
+        if name == '--jobsize':
+            FLAGS.orchestra_jobsize = value
+            print "--jobsize ",value
+        if name == '--jobid':
+            FLAGS.orchestra_jobid = value
+            print "--jobid", value
+        if name == '--cores':
+            FLAGS.cores_num = value
+
+    if hasattr(FLAGS,"orchestra_jobsize") and hasattr(FLAGS,"orchestra_jobid"):
+        FLAGS.orchestra_arrayjob = True
+
+    print "orchestra job ",FLAGS.orchestra_arrayjob
+
+    if hasattr(FLAGS,'cores_num'):
+        print "cores num ",FLAGS.cores_num
+
 def get_pdb():
     kaggle = kaggleDataset('jan_13')
     kaggle.database_from_csv('/home/xl198/remark/dec_17_small.csv')
@@ -607,6 +655,7 @@ def get_pdb():
 
 
 if __name__ == '__main__':
+    parse_FLAG()
     kaggle = kaggleDataset('jan_13')
     kaggle.process_PDB_to_npy('/n/scratch2/xl198/data/jan_13/temp/train_docked_crystal_pair.csv',coded=False)
     kaggle.process_PDB_to_npy('/n/scratch2/xl198/data/jan_13/temp/test_docked_crystal_pair.csv', coded=True)

@@ -596,25 +596,26 @@ class kaggleDataset:
 
         for p in process_list:
             print "process start: ",p
-            p.start()
+            #p.start()
 
-        '''
+
         if coded:
-            for sourceFilePath in path_iterator(os.walk(os.path.join(sourcePath,self.receptorFolderName))):
-                self.PDB_2_npy(sourceFilePath,coded,is_receptor=True)
+            #for sourceFilePath in path_iterator(os.walk(os.path.join(sourcePath,self.receptorFolderName))):
+            #    self.PDB_2_npy(sourceFilePath,coded,is_receptor=True)
 
         else:
-            for sourceFilePath in path_iterator(os.walk(os.path.join(sourcePath,self.receptorFolderName))):
-                self.PDB_2_npy(sourceFilePath,coded,is_receptor=True)
+            #for sourceFilePath in path_iterator(os.walk(os.path.join(sourcePath,self.receptorFolderName))):
+            #    self.PDB_2_npy(sourceFilePath,coded,is_receptor=True)
 
-            for sourceFilePath in path_iterator(os.walk(os.path.join(sourcePath,self.crystalFolderName))):
+            for sourceFilePath in list(set(dataframe['code_crystal_destpath'])):
                 self.PDB_2_npy(sourceFilePath,coded,is_receptor=False)
-	'''
+
 
 
 
         for p in process_list:
-            p.join()
+            print "process join: ",p
+            #p.join()
 
 
 

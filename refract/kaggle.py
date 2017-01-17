@@ -218,7 +218,7 @@ class kaggleDataset:
         :param index: list of int
         :return:
         '''
-        for i in index[::-1]:
+        for i in index:
             #print "dataframe size: {}, ix {}".format(len(dataframe),i)
             func(dataframe.iloc[i],coded)
 
@@ -534,11 +534,12 @@ class kaggleDataset:
             docked_ligand_path = item['DestPath']
             crystal_ligand_path =item['crystal_destpath']
         if os.path.exists(docked_ligand_path) and os.path.exists(docked_ligand_path):
-            if not docked_ligand_overlaps_with_crystal(docked_ligand_path,crystal_ligand_path):
-                try:
+            try:
+                if not docked_ligand_overlaps_with_crystal(docked_ligand_path,crystal_ligand_path):
+                
                     self.PDB_2_npy(docked_ligand_path,coded,is_receptor=False)
-                except:
-                    pass
+            except:
+                pass
 
     def process_PDB_to_npy(self,dataframe,coded):
         '''
@@ -657,7 +658,7 @@ def get_pdb():
 if __name__ == '__main__':
     parse_FLAG()
     kaggle = kaggleDataset('jan_13')
-    kaggle.process_PDB_to_npy('/n/scratch2/xl198/data/jan_13/temp/train_docked_crystal_pair.csv',coded=False)
+    #kaggle.process_PDB_to_npy('/n/scratch2/xl198/data/jan_13/temp/train_docked_crystal_pair.csv',coded=False)
     kaggle.process_PDB_to_npy('/n/scratch2/xl198/data/jan_13/temp/test_docked_crystal_pair.csv', coded=True)
 
 

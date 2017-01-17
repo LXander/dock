@@ -9,7 +9,7 @@ from util.createfolder import create_chain_parent_folder,create_chain_folder
 
 class select:
     dockedBasePath = '/n/scratch2/xl198/dude/data/dude/docked_dude/docked_ligands/'
-    workplace = ''
+    workplace = '/n/scratch2/xl198/dude/data'
     thread_num = 16
     process_num = 12
 
@@ -91,7 +91,7 @@ class select:
             activesSource = map(lambda active:os.path.join(receptor,active),actives)
             activesDest   = map(lambda active:os.path.join('actives',receptor,active),actives)
             decoysSource  = map(lambda decoy:os.path.join(receptor,decoy),selected_decoys)
-            decoysDest    = map(lambda decoy:os.path.join('decoys',receptor,decoy),decoys)
+            decoysDest    = map(lambda decoy:os.path.join('decoys',receptor,decoy),selected_decoys)
 
             actives_col +=zip(activesSource,activesDest)
             decoys_col  +=zip(decoysSource,decoysDest)
@@ -109,3 +109,6 @@ class select:
 
 
 
+if __name__ == '__main__':
+    sel = select('jan_17')
+    sel.select_file()

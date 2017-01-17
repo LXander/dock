@@ -602,13 +602,16 @@ class kaggleDataset:
         if coded:
             #for sourceFilePath in path_iterator(os.walk(os.path.join(sourcePath,self.receptorFolderName))):
             #    self.PDB_2_npy(sourceFilePath,coded,is_receptor=True)
+            for sourceFilePath in list(set(dataframe['code_crystal_destpath'])):
+                self.PDB_2_npy(sourceFilePath,coded,is_receptor=False)
 
         else:
+            pass
             #for sourceFilePath in path_iterator(os.walk(os.path.join(sourcePath,self.receptorFolderName))):
             #    self.PDB_2_npy(sourceFilePath,coded,is_receptor=True)
 
-            for sourceFilePath in list(set(dataframe['code_crystal_destpath'])):
-                self.PDB_2_npy(sourceFilePath,coded,is_receptor=False)
+            #for sourceFilePath in path_iterator(os.walk(os.path.join(sourcePath,self.crystalFolderName))):
+            #    self.PDB_2_npy(sourceFilePath,coded,is_receptor=False)
 
 
 

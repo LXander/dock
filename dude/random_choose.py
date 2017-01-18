@@ -112,9 +112,15 @@ class select:
         source_file_path = os.path.join(self.dockedBasePath,item['sourcePath'])
         dest_file_path = os.path.join(self.datasetFolder,item['destPath'])
 
-        create_chain_parent_folder(dest_file_path)
+        dest_folder = dest_file_path.split('.')[0]
+        dest_file = os.path.basename(dest_file_path)
 
-        file_base_name,file_suffix = dest_file_path.split('.')
+
+        create_chain_folder(dest_folder)
+
+        final_path = os.path.join(dest_folder,dest_file)
+
+        file_base_name,file_suffix = final_path.split('.')
 
         for i in range(1,limit+1):
 

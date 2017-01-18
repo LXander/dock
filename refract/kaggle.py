@@ -143,8 +143,8 @@ class kaggleDataset:
         # in dataframe so we generate another dataframe for them
         train_set,train_receptor_crystal = self.train_set(trainset)
 
-        # for test set we will code all the ligand and receptor
-        test_set,test_receptor_crystal = self.code_test_set(testset,coded= True)
+        # don't code test set at this time
+        test_set,test_receptor_crystal = self.test_set(testset)
 
         # write down all the dataframe into temp folder
         self.write_dataframe(train_set,'train_set')
@@ -244,7 +244,7 @@ class kaggleDataset:
         for t in thread_list:
             t.join()
 
-    def convert(self,dataframe,coded=False,is_docked=True):
+    def convert(self,dataframe,coded=False,is_docked=True,rm_overlap=False):
         '''
         according the result of 'database_from_csv'
         running multiprocess to get result
@@ -257,6 +257,9 @@ class kaggleDataset:
 
 
         convert_func = self.entry_convert if is_docked else self.receptor_crystal_convert
+
+        if rm_overlap:
+            convert_func = self.remove_overlap
 
         if hasattr(FLAGS,'cores'):
             self.process_num = FLAGS.cores
@@ -310,7 +313,7 @@ class kaggleDataset:
 
         trainset['DestPath'] = trainset.apply(
             lambda item: os.path.join(self.kaggleBasePath,
-                                      "labeled_pdb",
+                                      "train_pdb",
                                       self.ligandFolderName,
                                       item['PDBname'],
                                       '_'.join([item['PDBname'],
@@ -333,7 +336,7 @@ class kaggleDataset:
 
         receptorAndCrystal['receptor_destpath'] = receptorAndCrystal.apply(
             lambda item: os.path.join(self.kaggleBasePath,
-                                      "labeled_pdb",
+                                      "train_pdb",
                                       self.receptorFolderName,
                                       item['PDBname']+'.pdb'),
             axis = 1
@@ -350,7 +353,7 @@ class kaggleDataset:
 
         receptorAndCrystal['crystal_destpath'] = receptorAndCrystal.apply(
             lambda item: os.path.join(self.kaggleBasePath,
-                                      "labeled_pdb",
+                                      "train_pdb",
                                       self.crystalFolderName,
                                       item['PDBname'],
                                       '_'.join([item['PDBname'],
@@ -365,6 +368,77 @@ class kaggleDataset:
         self.write_dataframe(docked_crystal_pair, 'train_docked_crystal_pair')
 
         return trainset,receptorAndCrystal
+
+    def test_set(self, testset):
+
+
+        testset['SourcePath'] = testset.apply(
+            lambda item: os.path.join(self.source_base,
+                                      item['PDBname'],
+                                      '_'.join([item['PDBname'],
+                                               item['RES'],
+                                               'ligand',
+                                               'fast.pdb'])),
+            axis=1
+        )
+
+        testset['DestPath'] = testset.apply(
+            lambda item: os.path.join(self.kaggleBasePath,
+                                      "test_pdb",
+                                      self.ligandFolderName,
+                                      item['PDBname'],
+                                      '_'.join([item['PDBname'],
+                                               item['RES'],
+                                               'ligand',
+                                               'fast',
+                                               item['FrameId'] + '.pdb'])),
+            axis=1
+        )
+
+        crystalLigands = list(set(zip(testset['PDBname'], testset['RES'])))
+        receptorAndCrystal = pd.DataFrame(data=crystalLigands, columns=['PDBname', 'RES'])
+
+        receptorAndCrystal['receptor_sourcepath'] = receptorAndCrystal.apply(
+            lambda item: os.path.join(self.receptor_base,
+                                      item['PDBname'],
+                                      item['PDBname'] + '.pdb'),
+            axis=1
+        )
+
+        receptorAndCrystal['receptor_destpath'] = receptorAndCrystal.apply(
+            lambda item: os.path.join(self.kaggleBasePath,
+                                      "test_pdb",
+                                      self.receptorFolderName,
+                                      item['PDBname']+'.pdb'),
+            axis = 1
+        )
+
+        receptorAndCrystal['crystal_sourcepath'] = receptorAndCrystal.apply(
+            lambda item: os.path.join(self.crystal_base,
+                                      item['PDBname'],
+                                      '_'.join([item['PDBname'],
+                                               item['RES'],
+                                               'ligand.pdb'])),
+            axis=1
+        )
+
+        receptorAndCrystal['crystal_destpath'] = receptorAndCrystal.apply(
+            lambda item: os.path.join(self.kaggleBasePath,
+                                      "test_pdb",
+                                      self.crystalFolderName,
+                                      item['PDBname'],
+                                      '_'.join([item['PDBname'],
+                                               item['RES'],
+                                               'ligand.pdb'])),
+            axis=1
+        )
+
+        docked_dest = testset[['PDBname', 'RES', 'DestPath']]
+        crystal_dest = receptorAndCrystal[['PDBname', 'RES', 'crystal_destpath']]
+        docked_crystal_pair = docked_dest.merge(crystal_dest, on=['PDBname', 'RES'])
+        self.write_dataframe(docked_crystal_pair, 'test_docked_crystal_pair')
+
+        return testset, receptorAndCrystal
 
     def code_test_set(self,testset,coded=True):
         '''
@@ -547,13 +621,36 @@ class kaggleDataset:
         else:
             docked_ligand_path = item['DestPath']
             crystal_ligand_path =item['crystal_destpath']
-        if os.path.exists(docked_ligand_path) and os.path.exists(docked_ligand_path):
+        if os.path.exists(docked_ligand_path) and os.path.exists(crystal_ligand_path):
             try:
                 if not docked_ligand_overlaps_with_crystal(docked_ligand_path,crystal_ligand_path):
                 
                     self.PDB_2_npy(docked_ligand_path,coded,is_receptor=False)
             except:
                 pass
+
+    def remove_overlap(self, item, coded):
+        '''
+        if docked ligand doesn't overlap with crystal ligand
+        convert docked ligand into npy format
+        :param item: row of dataframe
+        :param coded: bool
+        :return:
+        '''
+        if coded:
+            docked_ligand_path = item['code_destpath']
+            crystal_ligand_path = item['code_crystal_destpath']
+        else:
+            docked_ligand_path = item['DestPath']
+            crystal_ligand_path = item['crystal_destpath']
+        if os.path.exists(docked_ligand_path) and os.path.exists(crystal_ligand_path):
+            try:
+                if docked_ligand_overlaps_with_crystal(docked_ligand_path, crystal_ligand_path):
+                  os.popen('rm {}'.format(docked_ligand_path))
+            except:
+                pass
+
+
 
     def process_PDB_to_npy(self,dataframe,coded):
         '''
@@ -665,8 +762,8 @@ def parse_FLAG():
         print "cores num ",FLAGS.cores
 
 def get_pdb():
-    kaggle = kaggleDataset('jan_13_big')
-    kaggle.database_from_csv('/home/xl198/remark/dec_17.csv')
+    kaggle = kaggleDataset('jan_18')
+    kaggle.database_from_csv('/home/xl198/remark/dec_17_small.csv')
     kaggle.convert('train_set.csv')
     kaggle.convert('train_receptor_crystal.csv', is_docked=False)
     kaggle.convert('test_set.csv', coded=True)
@@ -680,6 +777,8 @@ def get_npy():
 
 if __name__ == '__main__':
     parse_FLAG()
+    kaggle = kaggleDataset('jan_18_small')
+    kaggle.database_from_csv('/home/xl198/remark/dec_17_small.csv')
 
 
 

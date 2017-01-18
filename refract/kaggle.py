@@ -258,12 +258,25 @@ class kaggleDataset:
 
         convert_func = self.entry_convert if is_docked else self.receptor_crystal_convert
 
+        if hasattr(FLAGS,'cores'):
+            self.process_num = FLAGS.cores
+
         # if get a str, read csv
         if type(dataframe) == str:
             try:
                 dataframe = pd.read_csv(os.path.join(self.tempFolderPath,dataframe))
             except Exception as e:
                 print e
+
+        if FLAGS.orchestra_arrayjob:
+            jobsize = FLAGS.orchestra_jobsize
+            jobid = FLAGS.orchestra_jobid
+
+            # using iloc to slice dataframe result doesn't contains end [start,end)
+            linspace = np.linspace(0,len(dataframe),jobsize+1).astype(int)
+            dataframe = dataframe.iloc[linspace[jobid-1]:linspace[jobid]]
+
+        print "dataframe size ",len(dataframe)
 
         edge = np.linspace(0,len(dataframe),self.process_num+1).astype(int)
         process_list = [ multiprocessing.Process(target=self.process_convert,
@@ -275,10 +288,11 @@ class kaggleDataset:
                          for i in range(self.process_num)]
 
         for p in process_list:
-            #print "process start: ",p
+            print "process start: ",p
             p.start()
 
         for p in process_list:
+            print "process end: ",p
             p.join()
 
     def train_set(self,trainset):
@@ -596,29 +610,29 @@ class kaggleDataset:
 
         for p in process_list:
             print "process start: ",p
-            #p.start()
+            p.start()
 
 
         if coded:
-            #for sourceFilePath in path_iterator(os.walk(os.path.join(sourcePath,self.receptorFolderName))):
-            #    self.PDB_2_npy(sourceFilePath,coded,is_receptor=True)
+            for sourceFilePath in path_iterator(os.walk(os.path.join(sourcePath,self.receptorFolderName))):
+                self.PDB_2_npy(sourceFilePath,coded,is_receptor=True)
             for sourceFilePath in list(set(dataframe['code_crystal_destpath'])):
                 self.PDB_2_npy(sourceFilePath,coded,is_receptor=False)
 
         else:
             pass
-            #for sourceFilePath in path_iterator(os.walk(os.path.join(sourcePath,self.receptorFolderName))):
-            #    self.PDB_2_npy(sourceFilePath,coded,is_receptor=True)
+            for sourceFilePath in path_iterator(os.walk(os.path.join(sourcePath,self.receptorFolderName))):
+                self.PDB_2_npy(sourceFilePath,coded,is_receptor=True)
 
-            #for sourceFilePath in path_iterator(os.walk(os.path.join(sourcePath,self.crystalFolderName))):
-            #    self.PDB_2_npy(sourceFilePath,coded,is_receptor=False)
+            for sourceFilePath in path_iterator(os.walk(os.path.join(sourcePath,self.crystalFolderName))):
+                self.PDB_2_npy(sourceFilePath,coded,is_receptor=False)
 
 
 
 
         for p in process_list:
             print "process join: ",p
-            #p.join()
+            p.join()
 
 
 
@@ -651,19 +665,22 @@ def parse_FLAG():
         print "cores num ",FLAGS.cores
 
 def get_pdb():
-    kaggle = kaggleDataset('jan_13')
-    kaggle.database_from_csv('/home/xl198/remark/dec_17_small.csv')
+    kaggle = kaggleDataset('jan_13_big')
+    kaggle.database_from_csv('/home/xl198/remark/dec_17.csv')
     kaggle.convert('train_set.csv')
     kaggle.convert('train_receptor_crystal.csv', is_docked=False)
     kaggle.convert('test_set.csv', coded=True)
     kaggle.convert('test_receptor_crystal.csv', coded=True, is_docked=False)
 
+def get_npy():
+    kaggle = kaggleDataset('jan_13_big')
+    # kaggle.process_PDB_to_npy('/n/scratch2/xl198/data/jan_13_big/temp/train_docked_crystal_pair.csv',coded=False)
+    #kaggle.process_PDB_to_npy('/n/scratch2/xl198/data/jan_13_big/temp/test_docked_crystal_pair.csv', coded=True)
+
 
 if __name__ == '__main__':
     parse_FLAG()
-    kaggle = kaggleDataset('jan_13')
-    #kaggle.process_PDB_to_npy('/n/scratch2/xl198/data/jan_13/temp/train_docked_crystal_pair.csv',coded=False)
-    kaggle.process_PDB_to_npy('/n/scratch2/xl198/data/jan_13/temp/test_docked_crystal_pair.csv', coded=True)
+
 
 
 

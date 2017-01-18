@@ -97,12 +97,11 @@ class select:
             decoysSource  = map(lambda decoy:os.path.join(receptor,decoy),selected_decoys)
             decoysDest    = map(lambda decoy:[decoy,os.path.join('decoys',decoy)],decoysSource)
 
-            #actives_col +=zip(activesSource,activesDest)
-            #decoys_col  +=zip(decoysSource,decoysDest)
+            actives_col +=activesDest
+            decoys_col  +=decoysDest
 
-
-        actives_df  = pd.DataFrame(activesDest,columns=['sourcePath','destPath'])
-        decoys_df   = pd.DataFrame(decoysDest ,columns=['sourcePath','destPath'])
+        actives_df  = pd.DataFrame(actives_col,columns=['sourcePath','destPath'])
+        decoys_df   = pd.DataFrame(decoys_col ,columns=['sourcePath','destPath'])
         receptors_df= pd.DataFrame(receptors_col, columns=['sourcePath','destPath'])
 
         self.write_dataframe(actives_df,'actives')

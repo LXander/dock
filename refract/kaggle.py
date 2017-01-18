@@ -649,7 +649,7 @@ class kaggleDataset:
         if os.path.exists(docked_ligand_path) and os.path.exists(crystal_ligand_path):
             try:
                 if docked_ligand_overlaps_with_crystal(docked_ligand_path, crystal_ligand_path):
-                  os.popen('rm {}'.format(docked_ligand_path))
+                    os.popen('rm {}'.format(docked_ligand_path))
             except:
                 pass
 
@@ -774,8 +774,8 @@ def get_pdb():
 
 def get_npy():
     kaggle = kaggleDataset('jan_13_big')
-    # kaggle.process_PDB_to_npy('/n/scratch2/xl198/data/jan_13_big/temp/train_docked_crystal_pair.csv',coded=False)
-    #kaggle.process_PDB_to_npy('/n/scratch2/xl198/data/jan_13_big/temp/test_docked_crystal_pair.csv', coded=True)
+    kaggle.process_PDB_to_npy('/n/scratch2/xl198/data/jan_13_big/temp/train_docked_crystal_pair.csv',coded=False)
+    kaggle.process_PDB_to_npy('/n/scratch2/xl198/data/jan_13_big/temp/test_docked_crystal_pair.csv', coded=True)
 
 
 if __name__ == '__main__':
@@ -783,9 +783,7 @@ if __name__ == '__main__':
     kaggle = kaggleDataset('jan_18_small')
     kaggle.database_from_csv('/home/xl198/remark/dec_17_small.csv')
 
-    kaggle = kaggleDataset('jan_13_big')
-    #kaggle.database_from_csv('/home/xl198/remark/dec_17.csv')
-    kaggle.convert('train_set.csv')
+
 
 
 

@@ -781,9 +781,11 @@ def get_npy():
 if __name__ == '__main__':
     parse_FLAG()
     kaggle = kaggleDataset('jan_18_small')
-    kaggle.database_from_csv('/home/xl198/remark/dec_17_small.csv')
-
-
+    #kaggle.database_from_csv('/home/xl198/remark/dec_17_small.csv')
+    #kaggle.convert('train_set.csv')
+    #kaggle.convert('train_receptor_crystal.csv', is_docked=False)
+    #kaggle.convert('test_set.csv',)
+    kaggle.convert('test_receptor_crystal.csv', is_docked=False)
 
 
 

@@ -5,6 +5,7 @@ import random
 import threading
 import multiprocessing
 import numpy as np
+import getopt
 
 sys.path.append("..")
 from util.createfolder import create_chain_parent_folder,create_chain_folder
@@ -156,30 +157,73 @@ class select:
         # if get a str, read csv
         if type(dataframe) == str:
             try:
-                dataframe = pd.read_csv(os.path.join(self.tempFolderPath,dataframe))
+                dataframe = pd.read_csv(os.path.join(self.datasetFolder,dataframe))
             except Exception as e:
                 print e
 
-        edge = np.linspace(0,len(dataframe),self.process_num+1).astype(int)
-        process_list = [ multiprocessing.Process(target=self.process_convert,
-                                                 args=(convert_func,
-                                                       dataframe,
-                                                       range(edge[i],
-                                                             edge[i+1])))
-                         for i in range(self.process_num)]
+        if FLAGS.orchestra_arrayjob:
+            jobsize = FLAGS.orchestra_jobsize
+            jobid = FLAGS.orchestra_jobid
+            linspace = np.linspace(0, len(dataframe), jobsize + 1).astype(int)
+            dataframe = dataframe.iloc[linspace[jobid - 1]:linspace[jobid]]
+            print linspace[jobid-1],linspace[jobid]
+            for item in dataframe:
+                convert_func(item)
 
-        for p in process_list:
-            #print "process start: ",p
-            p.start()
-
-        for p in process_list:
-            p.join()
+        else:
 
 
+            edge = np.linspace(0,len(dataframe),self.process_num+1).astype(int)
+            process_list = [ multiprocessing.Process(target=self.process_convert,
+                                                     args=(convert_func,
+                                                           dataframe,
+                                                           range(edge[i],
+                                                                 edge[i+1])))
+                             for i in range(self.process_num)]
+
+            for p in process_list:
+                #print "process start: ",p
+                p.start()
+
+            for p in process_list:
+                p.join()
+
+
+class FLAGS:
+    orchestra_arrayjob = False
+
+def parse_FLAG():
+    try:
+        opts,args = getopt.getopt(sys.argv[1:],None,["jobsize=","jobid=","cores="])
+    except getopt.GetoptError as err:
+        # print help information and exit:
+        print str(err)  # will print something like "option -a not recognized"
+
+        sys.exit(2)
+
+    for name,value in opts:
+        if name == '--jobsize':
+            FLAGS.orchestra_jobsize = int(value)
+            print "--jobsize ",value
+        if name == '--jobid':
+            FLAGS.orchestra_jobid = int(value)
+            print "--jobid", value
+        if name == '--cores':
+            FLAGS.cores = int(value)
+
+    if hasattr(FLAGS,"orchestra_jobsize") and hasattr(FLAGS,"orchestra_jobid"):
+        FLAGS.orchestra_arrayjob = True
+
+    print "orchestra job ",FLAGS.orchestra_arrayjob
+
+    if hasattr(FLAGS,'cores'):
+        print "cores num ",FLAGS.cores
 
 
 
 if __name__ == '__main__':
+    parse_FLAG()
+
     sel = select('jan_17')
     sel.select_file()
     sel.convert('actives.csv')

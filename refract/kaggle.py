@@ -230,6 +230,10 @@ class kaggleDataset:
         # linspace contain end value but range don't
         # so we use edge[i+1] to select value in index
         # end should be len(index)-1
+
+        if len(index)<self.thread_num:
+            self.thread_num = 1
+
         edge = np.linspace(0,len(index)-1,self.thread_num+1).astype(int)
 
         thread_list = [ threading.Thread(target=self.thread_convert,
@@ -284,6 +288,9 @@ class kaggleDataset:
 
         print "dataframe size ",len(dataframe)
 
+        # when there's not enough entry to comvert , decrease thread's num
+        if len(dataframe)<self.process_num*self.thread_num:
+            self.process_num = 1
         edge = np.linspace(0,len(dataframe),self.process_num+1).astype(int)
         process_list = [ multiprocessing.Process(target=self.process_convert,
                                                  args=(convert_func,

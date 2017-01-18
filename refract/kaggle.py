@@ -205,7 +205,10 @@ class kaggleDataset:
 
         cmd = 'obabel -ipdb {} -f {} -l {} -opdb -O {}'.format(source_file_path,Id,Id,dest_file_path)
 
-        create_chain_parent_folder(dest_file_path)
+        try:
+            create_chain_parent_folder(dest_file_path)
+        except:
+            pass
         if not os.path.exists(dest_file_path):
             os.popen(cmd)
 
@@ -681,7 +684,9 @@ def get_npy():
 if __name__ == '__main__':
     parse_FLAG()
 
-
+    kaggle = kaggleDataset('jan_13_big')
+    #kaggle.database_from_csv('/home/xl198/remark/dec_17.csv')
+    kaggle.convert('train_set.csv')
 
 
 

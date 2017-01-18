@@ -7,7 +7,7 @@ import multiprocessing
 import numpy as np
 import getopt
 
-sys.path.append("..")
+sys.path.append(os.path.dirname(sys.path[0])) 
 from util.createfolder import create_chain_parent_folder,create_chain_folder
 
 
@@ -124,20 +124,30 @@ class select:
         file_base_name,file_suffix = final_path.split('.')
 
         for i in range(1,limit+1):
-
-            cmd = 'obabel -ipdb {} -f {} -l {} -opdb -O {}'.format(source_file_path, i, i, file_base_name+str(i)+'.'+file_suffix)
-            print cmd
-            #os.popen(cmd)
+	    final_file_path = file_base_name+'_'+str(i)+'.'+file_suffix
+            cmd = 'obabel -ipdb {} -f {} -l {} -opdb -O {}'.format(source_file_path, i, i, final_file_path)
+            print i
+            os.popen(cmd)
+            content = os.popen("cat {} | wc -l".format(final_file_path)).read().strip()
+            
+            if content == '0':
+                os.popen("rm {}".format(final_file_path))
+                break
 
     def copy_file(self,item):
-        source_file_path = os.path.join(self.dockedBasePath,item['sourcePath'])
+        '''
+        smina only can use original receptor file
+        prody need receptor which is convert by obabel
+        '''
+        sourceBasePath = '/n/scratch2/xl198/dude/data/dude/pdbs/original_receptors/'
+        source_file_path = os.path.join(sourceBasePath,os.path.basename(item['sourcePath']))
         dest_file_path = os.path.join(self.datasetFolder,item['destPath'])
 
         create_chain_parent_folder(dest_file_path)
 
         cmd = 'cp {} {}'.format(source_file_path,dest_file_path)
         print cmd
-        #os.popen(cmd)
+        os.popen(cmd)
 
 
     def convert(self,dataframe,is_docked=True):
@@ -157,18 +167,22 @@ class select:
         # if get a str, read csv
         if type(dataframe) == str:
             try:
-                dataframe = pd.read_csv(os.path.join(self.datasetFolder,dataframe))
+                dataframe = pd.read_csv(os.path.join(self.dataframeFolder,dataframe))
             except Exception as e:
                 print e
 
-        if FLAGS.orchestra_arrayjob:
+        if not is_docked:
+            for i in range(len(dataframe)):
+                convert_func(dataframe.iloc[i]) 
+           
+        elif FLAGS.orchestra_arrayjob:
             jobsize = FLAGS.orchestra_jobsize
             jobid = FLAGS.orchestra_jobid
             linspace = np.linspace(0, len(dataframe), jobsize + 1).astype(int)
-            dataframe = dataframe.iloc[linspace[jobid - 1]:linspace[jobid]]
-            print linspace[jobid-1],linspace[jobid]
-            for item in dataframe:
-                convert_func(item)
+            #dataframe = dataframe.iloc[linspace[jobid - 1]:linspace[jobid]]
+            index = range(linspace[jobid-1],linspace[jobid])
+            for i in index:
+                convert_func(dataframe.iloc[i])
 
         else:
 
@@ -223,7 +237,6 @@ def parse_FLAG():
 
 if __name__ == '__main__':
     parse_FLAG()
-
     sel = select('jan_17')
-    sel.select_file()
-    sel.convert('actives.csv')
+    #sel.select_file()
+    sel.convert('receptors.csv',is_docked=False)

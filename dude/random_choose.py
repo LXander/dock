@@ -149,8 +149,24 @@ class select:
         print cmd
         os.popen(cmd)
 
+    def copy_ligand(self,item):
+        '''
+        copy original ligand directly to the /original folder
+        :param item:  pd.DataFrame item
+        :return:
+        '''
+        sourceBasePath ='/n/scratch2/xl198/dude/data/dude/pdbs/ligands'
+        source_file_path = os.path.join(sourceBasePath,item['sourcePath'])
+        dest_file_path = os.path.join(self.datasetFolder,'original',item['destPath'])
 
-    def convert(self,dataframe,is_docked=True):
+        create_chain_parent_folder(dest_file_path)
+
+        cmd = "cp {} {}".format(source_file_path,dest_file_path)
+        print cmd
+        #os.popen(cmd)
+
+
+    def convert(self,dataframe,is_docked=True,func = None):
         '''
         according the result of 'database_from_csv'
         running multiprocess to get result
@@ -163,6 +179,9 @@ class select:
 
 
         convert_func = self.obabel_split if is_docked else self.copy_file
+
+        if func:
+            convert_func = func
 
         # if get a str, read csv
         if type(dataframe) == str:
@@ -239,4 +258,5 @@ if __name__ == '__main__':
     parse_FLAG()
     sel = select('jan_17')
     #sel.select_file()
-    sel.convert('receptors.csv',is_docked=False)
+    #sel.convert('receptors.csv',is_docked=False)
+    sel.convert('actives.csv',func=sel.copy_ligand)

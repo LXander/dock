@@ -16,7 +16,7 @@ def createFolder(folderPath):
         os.mkdir(folderPath)
 
 def createBaseFolder():
-    BaseFolders =['crystal_ligands' , 'docked_ligands' , 'receptors']
+    BaseFolders =['crystal_ligands' , 'ligands' , 'receptors']
     map(lambda folder:createFolder(os.path.join(destBase,folder)),BaseFolders)
 
 def gunzip(gzfile):
@@ -61,7 +61,7 @@ def convert(receptor):
     activesMol2 = gunzip(activesGz)
     if not activesMol2:
         return None
-    activesDestFolder = os.path.join(destBase,'docked_ligands',receptor)
+    activesDestFolder = os.path.join(destBase,'ligands',receptor)
     createFolder(activesDestFolder)
     activesDestFile = os.path.join(activesDestFolder,receptor+'_actives_.pdb')
     activesCmd = 'obabel -imol2 {} -opdb -O {} -m'.format(activesMol2,activesDestFile)
@@ -72,7 +72,7 @@ def convert(receptor):
     decoysMol2 = gunzip(decoysGz)
     if not decoysMol2:
         return None
-    decoysDestFolder = os.path.join(destBase,'docked_ligands',receptor)
+    decoysDestFolder = os.path.join(destBase,'ligands',receptor)
     createFolder(decoysDestFolder)
     decoysDestFile = os.path.join(decoysDestFolder,receptor+'_decoys_.pdb')
     decoysCmd = 'obabel -imol2 {} -opdb -O {} -m'.format(decoysMol2,decoysDestFile)
@@ -107,9 +107,10 @@ def docking_offset(offset):
             else:
                 remain.append([receptor,ligand,ligand_box,output])
 
-        if not offset:
-            remain_df = pd.DataFrame(data=remain, columns=['receptor', 'ligand', 'ligand_box', 'output'])
-            remain_df.to_csv('/n/scratch2/xl198/dude/frame/remain.csv', index=False)
+    # when no offset, store the index for all unconverted ligands' information
+    if not offset:
+        remain_df = pd.DataFrame(data=remain, columns=['receptor', 'ligand', 'ligand_box', 'output'])
+        remain_df.to_csv('/n/scratch2/xl198/dude/frame/remain.csv', index=False)
 
 
 

@@ -230,9 +230,13 @@ class kaggleDataset:
         # linspace contain end value but range don't
         # so we use edge[i+1] to select value in index
         # end should be len(index)-1
+        
 
         if len(index)<self.thread_num:
-            self.thread_num = 1
+            for i in index:
+                func(dataframe.iloc[i],coded)
+            return 
+        
 
         edge = np.linspace(0,len(index)-1,self.thread_num+1).astype(int)
 
@@ -287,10 +291,13 @@ class kaggleDataset:
             dataframe = dataframe.iloc[linspace[jobid-1]:linspace[jobid]]
 
         print "dataframe size ",len(dataframe)
-
+        
         # when there's not enough entry to comvert , decrease thread's num
         if len(dataframe)<self.process_num*self.thread_num:
-            self.process_num = 1
+            
+            for i in range(len(dataframe)):
+                convert_func(dataframe.iloc[i],coded)
+            return
         edge = np.linspace(0,len(dataframe),self.process_num+1).astype(int)
         process_list = [ multiprocessing.Process(target=self.process_convert,
                                                  args=(convert_func,
@@ -656,8 +663,12 @@ class kaggleDataset:
         if os.path.exists(docked_ligand_path) and os.path.exists(crystal_ligand_path):
             try:
                 if docked_ligand_overlaps_with_crystal(docked_ligand_path, crystal_ligand_path):
+                    print "remove"
                     os.popen('rm {}'.format(docked_ligand_path))
+                else:
+                    print "save"
             except:
+                
                 pass
 
 
@@ -787,12 +798,14 @@ def get_npy():
 
 if __name__ == '__main__':
     parse_FLAG()
-    kaggle = kaggleDataset('jan_18_small')
-    #kaggle.database_from_csv('/home/xl198/remark/dec_17_small.csv')
+    kaggle = kaggleDataset('jan_18_big')
+    kaggle.convert('train_docked_crystal_pair.csv',rm_overlap=True)
+    kaggle.convert('test_docked_crystal_pair.csv',rm_overlap=True)
+    #kaggle.database_from_csv('/home/xl198/remark/dec_17_nodude.csv')
     #kaggle.convert('train_set.csv')
     #kaggle.convert('train_receptor_crystal.csv', is_docked=False)
     #kaggle.convert('test_set.csv',)
-    kaggle.convert('test_receptor_crystal.csv', is_docked=False)
+    #kaggle.convert('test_receptor_crystal.csv', is_docked=False)
 
 
 

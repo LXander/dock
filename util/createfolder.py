@@ -1,5 +1,10 @@
 import os,sys,re
 
+def try_create_chain_folder(folderPath):
+    try:
+        create_chain_folder(folderPath)
+    except:
+        print "{} exists".format(folderPath)
 
 def create_chain_parent_folder(filePath):
     dirPath = os.path.dirname(filePath)

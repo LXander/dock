@@ -7,8 +7,29 @@ import multiprocessing
 import numpy as np
 import getopt
 
+test_receptor = ["aa2ar.pdb",
+"ada17.pdb",
+"adrb1.pdb",
+"cp2c9.pdb",
+"cp3a4.pdb",
+"dyr.pdb",
+"gcr.pdb",
+"gria2.pdb",
+"hdac2.pdb",
+"kith.pdb",
+"lkha4.pdb",
+"mk10.pdb",
+"mmp13.pdb",
+"nram.pdb",
+"pgh1.pdb",
+"ppara.pdb",
+"ppard.pdb",
+"pparg.pdb",
+"rxra.pdb",
+"vgfr2.pdb"]
+
 sys.path.append(os.path.dirname(sys.path[0])) 
-from util.createfolder import create_chain_parent_folder,create_chain_folder
+from util.createfolder import create_chain_parent_folder,create_chain_folder,try_create_chain_folder
 
 
 class select:
@@ -75,11 +96,14 @@ class select:
         result = map(lambda i:pool[i],index[:num])
         return result
 
+    def select_except_test(self,pool,test_pool):
+        return list(set(pool)-set(test_pool))
+
     def select_file(self):
 
 
-        receptors = self.random_select(os.listdir(self.dockedBasePath), 20)
-
+        #receptors = self.random_select(os.listdir(self.dockedBasePath), 20)
+        receptors = self.select_except_test(os.listdir(self.dockedBasePath),test_receptor)
         actives_col   = []
         decoys_col    = []
         receptors_col = map(lambda receptor:os.path.join('receptors',receptor+'.pdb'),receptors)
@@ -258,7 +282,7 @@ def parse_FLAG():
 
 if __name__ == '__main__':
     parse_FLAG()
-    sel = select('jan_17')
-    #sel.select_file()
-    sel.convert('receptors.csv',is_docked=False)
+    sel = select('jan_22')
+    sel.select_file()
+    #sel.convert('receptors.csv',is_docked=False)
     #sel.convert('decoys.csv',func=sel.copy_ligand)

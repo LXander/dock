@@ -139,7 +139,7 @@ class select:
         smina only can use original receptor file
         prody need receptor which is convert by obabel
         '''
-        sourceBasePath = '/n/scratch2/xl198/dude/data/dude/pdbs/original_receptors/'
+        sourceBasePath = '/n/scratch2/xl198/dude/data/dude/pdbs/receptors/'
         source_file_path = os.path.join(sourceBasePath,os.path.basename(item['sourcePath']))
         dest_file_path = os.path.join(self.datasetFolder,item['destPath'])
 
@@ -158,12 +158,14 @@ class select:
         sourceBasePath ='/n/scratch2/xl198/dude/data/dude/pdbs/ligands'
         source_file_path = os.path.join(sourceBasePath,item['sourcePath'])
         dest_file_path = os.path.join(self.datasetFolder,'original',item['destPath'])
-
-        create_chain_parent_folder(dest_file_path)
-
+        
+        try:
+            create_chain_parent_folder(dest_file_path)
+        except:
+            pass
         cmd = "cp {} {}".format(source_file_path,dest_file_path)
-        print cmd
-        #os.popen(cmd)
+        #print cmd
+        os.popen(cmd)
 
 
     def convert(self,dataframe,is_docked=True,func = None):
@@ -258,5 +260,5 @@ if __name__ == '__main__':
     parse_FLAG()
     sel = select('jan_17')
     #sel.select_file()
-    #sel.convert('receptors.csv',is_docked=False)
-    sel.convert('actives.csv',func=sel.copy_ligand)
+    sel.convert('receptors.csv',is_docked=False)
+    #sel.convert('decoys.csv',func=sel.copy_ligand)

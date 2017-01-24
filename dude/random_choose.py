@@ -113,7 +113,9 @@ class select:
             folder = os.path.join(self.dockedBasePath, receptor)
             actives = [ active for active in os.listdir(folder) if re.search("actives",active) ]
             decoys  = [ decoy  for decoy  in os.listdir(folder) if re.search("decoys", decoy ) ]
-
+            if len(actives) == 0 or len(decoys) == 0:
+                print "receptor {} doesn't have actives or decoys ligands".format(receptor)
+                continue
             selected_decoys = self.random_select(decoys,len(actives))
 
             activesSource = map(lambda active:os.path.join(receptor,active),actives)
@@ -283,6 +285,8 @@ def parse_FLAG():
 if __name__ == '__main__':
     parse_FLAG()
     sel = select('jan_22')
-    sel.select_file()
+    #sel.select_file()
+    #sel.convert('actives.csv',is_docked=True)
+    sel.convert('decoys.csv',is_docked=True)
     #sel.convert('receptors.csv',is_docked=False)
     #sel.convert('decoys.csv',func=sel.copy_ligand)

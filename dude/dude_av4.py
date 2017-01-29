@@ -6,7 +6,7 @@ import getopt
 
 
 
-sys.path.append("..")
+sys.path.append(os.path.dirname(sys.path[0]))
 from util.createfolder import create_chain_parent_folder,create_chain_folder,try_create_chain_folder
 
 class FLAGS:
@@ -58,15 +58,16 @@ def convert_database_to_av4(database_path,positives_folder=None,decoys_folder=No
 
 
     count = 0
-    database_ligand_path = os.path.join(database_path,'ligands')
+    database_ligand_path = os.path.join(database_path,'actives')
     database_receptor_path = os.path.join(database_path,'receptors')
     for receptor in os.listdir(database_ligand_path):
         for ligand_name in os.listdir(os.path.join(database_ligand_path,receptor)):
             count +=1
+            
             destFile = os.path.join(output_path,receptor, ligand_name+".av4")
             if os.path.exists(destFile):
                 continue
-            if FLAGS.orchestra_arrayjob and FLAGS.orchestra_jobid%FLAGS.orchestra_jobsize == count%FLAGS.orchestra_jobsize:
+            if FLAGS.orchestra_arrayjob and FLAGS.orchestra_jobid%FLAGS.orchestra_jobsize != count%FLAGS.orchestra_jobsize:
                 continue
             ligand_folder = os.path.join(database_ligand_path,receptor,ligand_name)
 
@@ -85,7 +86,10 @@ def convert_database_to_av4(database_path,positives_folder=None,decoys_folder=No
                 prody_first_ligand = prody.parsePDB(path_to_first_ligand)
 
                 multiframe_ligand_coords = prody_first_ligand.getCoords()
-                labels = np.array([0])
+                # for decoys set all the label as 0
+                #labels = np.array([0])
+		# for actives set all the label as 1
+                labels = np.array([1])
 
 
                 # if have more than one ligands, write them as one multiframe ligand
@@ -98,8 +102,10 @@ def convert_database_to_av4(database_path,positives_folder=None,decoys_folder=No
                             raise Exception('attempting to add ligand with different order of atoms')
 
                         multiframe_ligand_coords = np.dstack((multiframe_ligand_coords, prody_rest.getCoords()))
-
-                        labels = np.concatenate((labels, [0]))
+                        # for decoys set all the label as 0
+                        #labels = np.concatenate((labels, [0]))
+                        # for actives set all teh label as 1
+                        labels = np.concatenate((labels,[1]))
 
             except Exception as e:
                 print e
@@ -163,6 +169,6 @@ def parse_FLAG():
 
 if __name__ == '__main__':
     parse_FLAG()
-    convert_database_to_av4(database_path="/home/ubuntu/xiao/data/newkaggle/dude/test_set/test_set",positives_folder="crystal_ligands",decoys_folder="docked_ligands",receptors_folder='receptors')
+    convert_database_to_av4(database_path="/n/scratch2/xl198/dude/data/jan_22/dataset",positives_folder="crystal_ligands",decoys_folder="docked_ligands",receptors_folder='receptors')
 
 

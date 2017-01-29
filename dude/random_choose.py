@@ -287,6 +287,6 @@ if __name__ == '__main__':
     sel = select('jan_22')
     #sel.select_file()
     #sel.convert('actives.csv',is_docked=True)
-    sel.convert('decoys.csv',is_docked=True)
-    #sel.convert('receptors.csv',is_docked=False)
+    #sel.convert('decoys.csv',is_docked=True)
+    sel.convert('receptors.csv',is_docked=False)
     #sel.convert('decoys.csv',func=sel.copy_ligand)

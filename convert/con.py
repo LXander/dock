@@ -14,7 +14,7 @@ class FLAGS:
 
 def convert(offset = None):
     files = glob(os.path.join(sourcePath),'*.pdb')
-    index = range(offset-1,len(files),FLAGS.jobsize) if offset else range(0,len(files))
+    index = range(offset-1,len(files),FLAGS.orchestra_jobsize) if offset else range(0,len(files))
     for i in index:
         sourceFilePath = files[i]
         destFilePath = sourceFilePath.replace(sourcePath,destPath)
@@ -27,7 +27,7 @@ def convert(offset = None):
 
 def main():
     if FLAGS.orchestra_arrayjob:
-        convert(FLAGS.jobid)
+        convert(FLAGS.orchestra_jobid)
     else:
         convert()
 

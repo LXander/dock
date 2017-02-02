@@ -6,6 +6,10 @@ def try_create_chain_folder(folderPath):
     except:
         print "{} exists".format(folderPath)
 
+def try_create_chain_parent_folder(filePath):
+    dirPath = os.path.dirname(filePath)
+    try_create_chain_folder(dirPath)
+
 def create_chain_parent_folder(filePath):
     dirPath = os.path.dirname(filePath)
     create_chain_folder(dirPath)

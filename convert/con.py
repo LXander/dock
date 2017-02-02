@@ -13,7 +13,7 @@ class FLAGS:
     orchestra_arrayjob = False
 
 def convert(offset = None):
-    files = glob(os.path.join(sourcePath),'*.pdb')
+    files = glob(os.path.join(sourcePath,'*.pdb'))
     index = range(offset-1,len(files),FLAGS.orchestra_jobsize) if offset else range(0,len(files))
     for i in index:
         sourceFilePath = files[i]
@@ -21,8 +21,8 @@ def convert(offset = None):
         destFilePath = destFilePath.replace('.pdb','.mol2')
         try_create_chain_parent_folder(destFilePath)
         cmd = 'obabel -ipdb {} -omol2 -O {}'.format(sourceFilePath,destFilePath)
-        #os.popen(cmd)
-        print "cmd"
+        os.popen(cmd)
+        print cmd
 
 
 def main():

@@ -1,5 +1,6 @@
 import config
 import os,sys
+import getopt
 #import subprocess
 import time
 
@@ -10,11 +11,13 @@ import time
 
 '''
 
+
+
 def convert(raw_file_path):
     print "convert"
     file_name = os.path.basename(raw_file_path)
     receptor_name = file_name.split('_')[0]
-    output_path = os.path.join(config.BASE_CONVERT2PDB, receptor_name)
+    output_path = os.path.join('/n/scratch2/xl198/YI/rigor_so/final', receptor_name)
     print output_path
     print os.path.exists(output_path)
     if not os.path.exists(output_path):
@@ -29,7 +32,7 @@ def run(input_file_path):
     
     file_name = os.path.basename(input_file_path)
     receptor_name = file_name.split('_')[0]
-    output_path = os.path.join(config.BASE_CONVERT,receptor_name)
+    output_path = os.path.join("/n/scratch2/xl198/YI/rigor_so/media",receptor_name)
     if not os.path.exists(output_path):
         os.mkdir(output_path)
 
@@ -51,26 +54,71 @@ def get_all(num = None):
         run(os.path.join(base,files[i]))
         sys.stderr.write("write %d/%d\n"%(i+1,size))
 
-def run_convert(base,offset):
+def old_run_convert(base,offset):
     base_path = config.BASE_YI
+    base_path = "/n/scratch2/xl198/YI/rigor_so/rigor_so"
     files = os.listdir(base_path)
     #print base
     #print offset
     index = base*1000+offset
-  
+
     if len(files)>index:
         run(os.path.join(base_path,files[index]))
         convert(os.path.join(base_path,files[index]))
-        
-        
+
+def run_convert(base,offset):
+    base_path = config.BASE_YI
+    base_path = "/n/scratch2/xl198/YI/rigor_so/rigor_so"
+    files = os.listdir(base_path)
+    #print base
+    #print offset
+    index = base*1000+offset
+    indexes = range(FLAGS.orchestra_jobid-1,len(files),FLAGS.orchestra_jobsize)
+    for index in indexes :
+        print indexes
+        run(os.path.join(base_path,files[index]))
+        convert(os.path.join(base_path,files[index]))
+
+class FLAGS:
+    orchestra_arrayjob = False
+
+def parse_FLAG():
+    try:
+        opts,args = getopt.getopt(sys.argv[1:],None,["jobsize=","jobid=","cores="])
+    except getopt.GetoptError as err:
+        # print help information and exit:
+        print str(err)  # will print something like "option -a not recognized"
+
+        sys.exit(2)
+
+    for name,value in opts:
+        if name == '--jobsize':
+            FLAGS.orchestra_jobsize = int(value)
+            print "--jobsize ",value
+        if name == '--jobid':
+            FLAGS.orchestra_jobid = int(value)
+            print "--jobid", value
+        if name == '--cores':
+            FLAGS.cores = int(value)
+
+    if hasattr(FLAGS,"orchestra_jobsize") and hasattr(FLAGS,"orchestra_jobid"):
+        FLAGS.orchestra_arrayjob = True
+
+    print "orchestra job ",FLAGS.orchestra_arrayjob
+
+    if hasattr(FLAGS,'cores'):
+        print "cores num ",FLAGS.cores
 
 def main():
+    '''
     args = sys.argv
     base  = int(args[1])
     offset = int(args[2])
-    
-    run_convert(base,offset)
-    sys.stderr.write("run convert %s"%(base*1000+offset))
+    '''
+    parse_FLAG()
+
+    run_convert()
+    #sys.stderr.write("run convert %s"%(base*1000+offset))
     '''
     if len(args)<2:
         num = None

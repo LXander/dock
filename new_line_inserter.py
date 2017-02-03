@@ -17,13 +17,13 @@ def convert(raw_file_path):
     print "convert"
     file_name = os.path.basename(raw_file_path)
     receptor_name = file_name.split('_')[0]
-    output_path = os.path.join('/n/scratch2/xl198/YI/rigor_so/final', receptor_name)
+    output_path = os.path.join(FLAGS.destPath, receptor_name)
     print output_path
     print os.path.exists(output_path)
     if not os.path.exists(output_path):
         os.mkdir(output_path)
 
-    input_file_path = os.path.join(config.BASE_CONVERT,receptor_name,file_name)
+    input_file_path = os.path.join(FLAGS.mediaPath,receptor_name,file_name)
     output_file_path = os.path.join(output_path,file_name.split('.')[0] + '.pdb')
     os.system('obabel -i mol2 %s -o pdb -O %s'%(input_file_path,output_file_path))
 
@@ -32,7 +32,7 @@ def run(input_file_path):
     
     file_name = os.path.basename(input_file_path)
     receptor_name = file_name.split('_')[0]
-    output_path = os.path.join("/n/scratch2/xl198/YI/rigor_so/media",receptor_name)
+    output_path = os.path.join(FLAGS.mediaPath,receptor_name)
     if not os.path.exists(output_path):
         os.mkdir(output_path)
 
@@ -55,8 +55,8 @@ def get_all(num = None):
         sys.stderr.write("write %d/%d\n"%(i+1,size))
 
 def old_run_convert(base,offset):
-    base_path = config.BASE_YI
-    base_path = "/n/scratch2/xl198/YI/rigor_so/rigor_so"
+
+    base_path = FLAGS.sourceBase
     files = os.listdir(base_path)
     #print base
     #print offset
@@ -66,21 +66,24 @@ def old_run_convert(base,offset):
         run(os.path.join(base_path,files[index]))
         convert(os.path.join(base_path,files[index]))
 
-def run_convert(base,offset):
-    base_path = config.BASE_YI
-    base_path = "/n/scratch2/xl198/YI/rigor_so/rigor_so"
+def run_convert():
+    #base_path = config.BASE_YI
+    base_path = FLAGS.sourceBase
     files = os.listdir(base_path)
     #print base
     #print offset
-    index = base*1000+offset
-    indexes = range(FLAGS.orchestra_jobid-1,len(files),FLAGS.orchestra_jobsize)
+    #index = base*1000+offset
+    indexes = range(FLAGS.jobid-1,len(files),FLAGS.jobsize)
     for index in indexes :
         print indexes
         run(os.path.join(base_path,files[index]))
         convert(os.path.join(base_path,files[index]))
 
 class FLAGS:
-    orchestra_arrayjob = False
+    arrayjob = False
+    sourceBase ="/n/scratch2/xl198/YI/rigor_so/rigor_so"
+    mediaPath = "/n/scratch2/xl198/YI/rigor_so/media"
+    destPath = "/n/scratch2/xl198/YI/rigor_so/final"
 
 def parse_FLAG():
     try:
@@ -93,18 +96,18 @@ def parse_FLAG():
 
     for name,value in opts:
         if name == '--jobsize':
-            FLAGS.orchestra_jobsize = int(value)
+            FLAGS.jobsize = int(value)
             print "--jobsize ",value
         if name == '--jobid':
-            FLAGS.orchestra_jobid = int(value)
+            FLAGS.jobid = int(value)
             print "--jobid", value
         if name == '--cores':
             FLAGS.cores = int(value)
 
     if hasattr(FLAGS,"orchestra_jobsize") and hasattr(FLAGS,"orchestra_jobid"):
-        FLAGS.orchestra_arrayjob = True
+        FLAGS.arrayjob = True
 
-    print "orchestra job ",FLAGS.orchestra_arrayjob
+    print "orchestra job ",FLAGS.arrayjob
 
     if hasattr(FLAGS,'cores'):
         print "cores num ",FLAGS.cores

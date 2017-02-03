@@ -1,6 +1,7 @@
 import os,sys
 from glob import glob
 import re
+import getopt
 
 pattern = re.compile(r'{(?P<key>[^\{\}]*)\:(?P<value>[^\{\}]*)}')
 
@@ -27,7 +28,7 @@ def parse_remarks(filename,filedir=None):
 
                 remarks = [rdict[key] for key in selected_columns]
                 with open(os.path.join(FLAGS.tempPath, 'temp_' + str(FLAGS.jobid) + '.txt'), 'a') as fout:
-                    fout.write(','.join(remarks))
+                    fout.write(','.join(remarks)+'/n')
 
 
 def run():
@@ -36,6 +37,15 @@ def run():
     indexes = range(FLAGS.jobid-1,len(filelist),FLAGS.jobsize)
     for index in indexes:
         parse_remarks(filelist[index])
+
+def merge():
+    filelist = glob(os.path.join(FLAGS.tempPath,'*.txt'))
+    filelist = list(filelist)
+    with open(os.path.join(os.path.dirname(FLAGS.tempPath),'forms.csv')) as fout:
+        for f in filelist:
+            with open(f) as fin:
+                for line in fin:
+                    fout.write(line)
 
 class FLAGS:
     arrayjob = False
@@ -69,3 +79,4 @@ def parse_FLAG():
 
     if hasattr(FLAGS,'cores'):
         print "cores num ",FLAGS.cores
+

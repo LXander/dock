@@ -2,12 +2,19 @@ import os,sys
 from glob import glob
 import re
 import getopt
+import pandas as pd
 
 pattern = re.compile(r'{(?P<key>[^\{\}]*)\:(?P<value>[^\{\}]*)}')
 
 full_columns = ['Autovina_gauss2','PDBResId','RMSF','center','Autovina_Hydrogen','Autovina_repulsion','PDBname','Contact Similarity','Resolution(A)','rotation','Autovina_gauss1','Autovina_Affinity(kcal/mol)','Autovina_hydrophobic']
 
 selected_columns = ['PDBname','PDBResId','RMSF','Autovina_Affinity(kcal/mol)']
+
+def modify():
+    df = pd.read_csv(os.path.join(os.path.dirname(FLAGS.tempPath),'forms.csv'))
+    df['frame_id'] = df['PDBResId'].apply(lambda x: int(x.split('_')[-1]))
+    df['ID'] = df.apply(lambda item: item['PDBname'] + '_' + item['PDBResId'].split('_')[0], axis = 1)
+    df.to_csv(os.path.join(os.path.dirname(FLAGS.tempPath),'full_forms.csv'),index=False)
 
 def parse_remarks(filename,filedir=None):
     if filedir is None:

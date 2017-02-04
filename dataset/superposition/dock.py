@@ -8,7 +8,7 @@ import threading
 import multiprocessing
 
 sys.path.append(os.path.dirname(os.path.dirname(sys.path[0])))
-from util.createfolder import try_create_chain_folder
+from util.createfolder import try_create_chain_folder,try_create_chain_parent_folder
 
 
 class docking:
@@ -136,17 +136,17 @@ class docking:
         ligand_box = item['ligand_box']
         ligand = item['ligand']
         dest_ligand = ligand.replace(FLAGS.dockSourcePath,dockDestPath)
-        try_create_chain_folder(dest_ligand)
+        try_create_chain_parent_folder(dest_ligand)
         cmd = "{} -r {} -l {} --autobox_ligand {} -o {} --num_modes=1000 --energy_range=100 --cpu=1 ".format(FLAGS.smina,receptor,ligand,ligand_box,dest_ligand)
         print cmd
 
 class FLAGS:
     arrayjob = False
     workplace = '/n/scratch2/xl198/data'
-    dockSourcePath = '/n/scratch2/xl198/dude/data/dude/pdbs/ligands/'
+    dockSourcePath = '/n/scratch2/xl198/dude/data/dude/pdbs/ligands'
     smina = '/home/xl198/program/smina/smina.static'
-    thread_num = 16
-    process_num = 12
+    thread_num = 1
+    process_num = 1
 
 def parse_FLAG():
     try:
@@ -167,10 +167,10 @@ def parse_FLAG():
         if name == '--cores':
             FLAGS.cores = int(value)
 
-    if hasattr(FLAGS,"orchestra_jobsize") and hasattr(FLAGS,"orchestra_jobid"):
+    if hasattr(FLAGS,"jobsize") and hasattr(FLAGS,"jobid"):
         FLAGS.arrayjob = True
 
-    print "orchestra job ",FLAGS.orchestra_arrayjob
+    print "orchestra job ",FLAGS.arrayjob
 
     if hasattr(FLAGS,'cores'):
         print "cores num ",FLAGS.cores

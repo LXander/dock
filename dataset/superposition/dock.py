@@ -7,7 +7,7 @@ import getopt
 import threading
 import multiprocessing
 
-sys.path.append(os.path.dirname(sys.path[0]))
+sys.path.append(os.path.dirname(os.path.dirname(sys.path[0])))
 from util.createfolder import try_create_chain_folder
 
 
@@ -73,7 +73,7 @@ class docking:
         for t in thread_list:
             t.join()
 
-    def convert(self, dataframe, coded=False, is_docked=True, rm_overlap=False):
+    def convert(self, dataframe,convert_func):
         '''
         according the result of 'database_from_csv'
         running multiprocess to get result
@@ -84,10 +84,9 @@ class docking:
         :return:
         '''
 
-        convert_func = self.entry_convert if is_docked else self.receptor_crystal_convert
+        #convert_func = self.entry_convert if is_docked else self.receptor_crystal_convert
 
-        if rm_overlap:
-            convert_func = self.remove_overlap
+
 
         if hasattr(FLAGS, 'cores'):
             self.process_num = FLAGS.cores
@@ -133,15 +132,21 @@ class docking:
 
     def convert_function(self,item):
         dockDestPath = os.path.join(self.dockingFolderPath)
-        cmd = 'smina '
-
+        receptor = item['receptor']
+        ligand_box = item['ligand_box']
+        ligand = item['ligand']
+        dest_ligand = ligand.replace(FLAGS.dockSourcePath,dockDestPath)
+        try_create_chain_folder(dest_ligand)
+        cmd = "{} -r {} -l {} --autobox_ligand {} -o {} --num_modes=1000 --energy_range=100 --cpu=1 ".format(FLAGS.smina,receptor,ligand,ligand_box,dest_ligand)
+        print cmd
 
 class FLAGS:
     arrayjob = False
     workplace = '/n/scratch2/xl198/data'
+    dockSourcePath = '/n/scratch2/xl198/dude/data/dude/pdbs/ligands/'
+    smina = '/home/xl198/program/smina/smina.static'
     thread_num = 16
     process_num = 12
-
 
 def parse_FLAG():
     try:
@@ -171,10 +176,7 @@ def parse_FLAG():
         print "cores num ",FLAGS.cores
 
 
-
-
-
 if __name__ == '__main__':
     parse_FLAG()
     dockclass = docking('Superposition')
-
+    dockclass.convert('/n/scratch2/xl198/data/Superposition/forms/docking_pair.csv',dockclass.convert_function)

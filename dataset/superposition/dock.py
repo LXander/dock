@@ -137,8 +137,9 @@ class docking:
         ligand = item['ligand']
         dest_ligand = ligand.replace(FLAGS.dockSourcePath,dockDestPath)
         try_create_chain_parent_folder(dest_ligand)
-        cmd = "{} -r {} -l {} --autobox_ligand {} -o {} --num_modes=1000 --energy_range=100 --cpu=1 ".format(FLAGS.smina,receptor,ligand,ligand_box,dest_ligand)
+        cmd = "{} -r {} -l {} --autobox_ligand {} -o {} --num_modes=1000 --energy_range=1000 --cpu=1 ".format(FLAGS.smina,receptor,ligand,ligand_box,dest_ligand)
         print cmd
+        os.popen(cmd)
 
 class FLAGS:
     arrayjob = False

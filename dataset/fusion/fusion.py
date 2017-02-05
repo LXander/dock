@@ -3,6 +3,8 @@ import pandas as pd
 import numpy  as np
 import tempfile
 import re
+from glob import glob
+
 
 
 def tanimoto(item):
@@ -19,14 +21,23 @@ def tanimoto(item):
 
     os.system(cmd)
 
-    command = os.popen('babel -d {} {} -ofpt -xfFP4'.format(sourFilePath,destFilePath))
-    ls =command.read()
-    try:
-        tanimoto_similarity = re.split('=|\n', ls)[2]
-    except:
-        sys.stderr.write(ls)
-        return FLAGS.tanimoto_cutoff+0.1
-    return tanimoto_similarity
+    # Calculate tanimoto similarity for all crystal ligand for the receptor
+    crystal_list = glob(os.path.join(FLAGS.crystalPath),item['PDBname'],"*.pdb")
+
+    tanimoto_list =[]
+
+    for crystal_ligand in crystal_list:
+        command = os.popen('babel -d {} {} -ofpt -xfFP4'.format(crystal_ligand,destFilePath))
+        ls =command.read()
+        try:
+            tanimoto_similarity = re.split('=|\n', ls)[2]
+            tanimoto_list.append(tanimoto_similarity)
+        except:
+            sys.stderr.write(ls)
+            tanimoto_list.append( FLAGS.tanimoto_cutoff+0.1)
+
+    return min(tanimoto_list)
+
 
 
 def fusion():
@@ -53,6 +64,7 @@ class FLAGS:
     tanimoto = 'tanimoto'
     tanimoto_cutoff = 0.75
     sourcePath = '/n/scratch2/xl198/data/pdbs'
+    crystalPath = '/n/scratch2/xl198/data/H/addH'
     batchsize = 10
 
 

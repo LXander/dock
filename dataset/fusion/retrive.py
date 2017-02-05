@@ -148,7 +148,7 @@ class docking:
             p.join()
 
     def convert_function(self, item):
-        destPath =os.path.join(self.dockingFolderPath,'decked_ligands')
+        destPath =os.path.join(self.dockingFolderPath,'fast','decked_ligands')
 
         sourceFileName = item['Id']+'_ligand_fast.pdb'
 
@@ -156,13 +156,29 @@ class docking:
 
         sourceFilePath = os.path.join(FLAGS.sourcePath,item['PDBname'],sourceFileName)
 
-        destFilePath = os.path.join(destPath,item['PDBname'],item['Id'],destFileName)
+        destFilePath = os.path.join(destPath,item['PDBname'],destFileName)
 
 
         try_create_chain_parent_folder(destFilePath)
 
         cmd = 'obabel -ipdb {} -opdb -O {} -m'.format(sourceFilePath,destFilePath)
 
+        receptor_folder = os.path.join(self.dockingFolderPath,'fast','receptors')
+        receptor_source = os.path.join(FLAGS.receptor_source,item['PDBname'],item['PDBname']+'.pdb')
+        receptor_dest = os.path.join(receptor_folder,item['PDBname'],item['PDBname']+'.pdb')
+
+        if not os.path.exists(receptor_dest):
+            try_create_chain_parent_folder(receptor_dest)
+            os.system('cp {} {}'.format(receptor_source,receptor_dest))
+
+
+        crystal_folder = os.path.join(self.dockingFolderPath,'fast','crystal_ligands')
+        crystal_source = os.path.join(FLAGS.crystal_source,item['PDBname'],item['PDBname']+'_ligand.pdb')
+        crystal_dest = os.path.join(crystal_folder,item['PDBname'],item['PDbname']+'_ligand.pdb')
+
+        if not os.path.exists(crystal_dest):
+            try_create_chain_parent_folder(crystal_dest)
+            os.system('cp {} {}'.format(crystal_source,crystal_dest))
 
         print cmd
         #os.system(cmd)
@@ -171,7 +187,8 @@ class docking:
 class FLAGS:
     arrayjob = False
     workplace = '/n/scratch2/xl198/data'
-
+    crystal_source ='/n/scratch2/xl198/data/pdbs'
+    receptor_source = '/n/scratch2/xl198/data/H/addH'
     dockSourcePath = '/n/scratch2/xl198/dude/data/dude/pdbs/ligands'
     smina = '/home/xl198/program/smina/smina.static'
     thread_num = 1

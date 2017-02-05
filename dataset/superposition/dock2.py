@@ -138,8 +138,9 @@ class docking:
         dest_ligand = ligand.replace(FLAGS.dockSourcePath,dockDestPath)
         try_create_chain_parent_folder(dest_ligand)
         cmd = "{} -r {} -l {} --autobox_ligand {} -o {} --num_modes=1000 --energy_range=1000 --cpu=1 ".format(FLAGS.smina,receptor,ligand,ligand_box,dest_ligand)
-        print cmd
+        
         if not os.path.exists(dest_ligand):
+            print cmd
             os.system(cmd)
 
 class FLAGS:
@@ -147,8 +148,8 @@ class FLAGS:
     workplace = '/n/scratch2/xl198/data'
     dockSourcePath = '/n/scratch2/xl198/dude/data/dude/pdbs/ligands'
     smina = '/home/xl198/program/smina/smina.static'
-    thread_num = 1
-    process_num = 1
+    thread_num = 4
+    process_num = 3
 
 def parse_FLAG():
     try:

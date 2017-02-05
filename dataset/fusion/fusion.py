@@ -12,7 +12,7 @@ def tanimoto(item):
     sourceFileName = item['ID'] + '_' +'ligand' + '_' + item['dataset'] + '.pdb'
     sourFilePath = os.path.join(FLAGS.sourcePath,item['PDBname'],sourceFileName)
 
-    destFileName = item['ID'] + '_' + item['dataset']+ '_' + item['inner_index']+'.pdb'
+    destFileName = item['ID'] + '_' + item['dataset']+ '_' + str(item['inner_index'])+'.pdb'
     destFilePath = os.path.join(FLAGS.tempPath,destFileName)
 
     cmd = 'obabel -ipdb {} -f {} -l {} -opdb -O {}'.format(sourFilePath, Id, Id, destFilePath)
@@ -37,11 +37,11 @@ def fusion():
     if FLAGS.tanimoto not in df.columns:
         df[FLAGS.tanimoto] = np.nan
 
-    null_index = df[df[FLAGS.tanimoto].isnull()]
+    null_index = df[df[FLAGS.tanimoto].isnull()].index
     if len(null_index) > FLAGS.batchsize:
         null_index = null_index[:FLAGS.batchsize]
 
-    df[null_index, FLAGS.tanimoto] = df[null_index].apply(tanimoto, axis=1)
+    df[FLAGS.tanimoto][null_index] = df.ix[null_index].apply(tanimoto, axis=1)
 
     df.to_csv(FLAGS.recordFile,index=False)
 

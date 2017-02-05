@@ -98,6 +98,24 @@ class docking:
             except Exception as e:
                 print e
 
+        if hasattr(FLAGS,'joboffset'):
+            loc = FLAGS.joboffset*FLAGS.jobsize+FLAGS.jobid-1
+            print "convert offset single ",loc
+            try:
+	        convert_func(dataframe.ix[loc])
+            except:
+                pass
+            return None
+
+        if hasattr(FLAGS,'scan'):
+            print "scan length ",len(dataframe)
+            for i in range(len(dataframe)):
+                print "convert single ",i
+                
+                convert_func(dataframe.ix[i])
+               
+            return None
+
         if FLAGS.arrayjob:
             jobsize = FLAGS.jobsize
             jobid = FLAGS.jobid
@@ -131,15 +149,18 @@ class docking:
             p.join()
 
     def convert_function(self,item):
+        
         dockDestPath = os.path.join(self.dockingFolderPath)
+        
         receptor = item['receptor']
         ligand_box = item['ligand_box']
         ligand = item['ligand']
         dest_ligand = ligand.replace(FLAGS.dockSourcePath,dockDestPath)
         try_create_chain_parent_folder(dest_ligand)
         cmd = "{} -r {} -l {} --autobox_ligand {} -o {} --num_modes=1000 --energy_range=1000 --cpu=1 ".format(FLAGS.smina,receptor,ligand,ligand_box,dest_ligand)
-        print cmd
+        
         if not os.path.exists(dest_ligand):
+            print cmd
             os.system(cmd)
 
 class FLAGS:
@@ -152,7 +173,7 @@ class FLAGS:
 
 def parse_FLAG():
     try:
-        opts,args = getopt.getopt(sys.argv[1:],None,["jobsize=","jobid=","cores="])
+        opts,args = getopt.getopt(sys.argv[1:],None,["offset=","jobsize=","jobid=","cores=","scan"])
     except getopt.GetoptError as err:
         # print help information and exit:
         print str(err)  # will print something like "option -a not recognized"
@@ -160,6 +181,8 @@ def parse_FLAG():
         sys.exit(2)
 
     for name,value in opts:
+        if name == '--offset':
+            FLAGS.joboffset = int(value)
         if name == '--jobsize':
             FLAGS.jobsize = int(value)
             print "--jobsize ",value
@@ -168,6 +191,8 @@ def parse_FLAG():
             print "--jobid", value
         if name == '--cores':
             FLAGS.cores = int(value)
+        if name == '--scan':
+            FLAGS.scan = True
 
     if hasattr(FLAGS,"jobsize") and hasattr(FLAGS,"jobid"):
         FLAGS.arrayjob = True

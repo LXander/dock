@@ -147,6 +147,74 @@ class docking:
             print "process end: ", p
             p.join()
 
+    def convert_ritor(self,item):
+        destPath = os.path.join(self.dockingFolderPath, 'rigor', 'docked_ligands')
+
+        sourceFileName = item['Id'] + '_ligand_rigor.pdb'
+
+        destFileName = item['Id'] + '_ligand_rigor_.pdb'
+
+        sourceFilePath = os.path.join(FLAGS.rigor_sourcePath, item['PDBname'], sourceFileName)
+
+        destFilePath = os.path.join(destPath, item['PDBname'], destFileName)
+
+        try_create_chain_parent_folder(destFilePath)
+
+        cmd = 'obabel -ipdb {} -opdb -O {} -m'.format(sourceFilePath, destFilePath)
+
+        receptor_folder = os.path.join(self.dockingFolderPath, 'fast', 'receptors')
+        receptor_source = os.path.join(FLAGS.receptor_source, item['PDBname'], item['PDBname'] + '.pdb')
+        receptor_dest = os.path.join(receptor_folder, item['PDBname'], item['PDBname'] + '.pdb')
+
+        if not os.path.exists(receptor_dest):
+            try_create_chain_parent_folder(receptor_dest)
+            os.system('cp {} {}'.format(receptor_source, receptor_dest))
+
+        crystal_folder = os.path.join(self.dockingFolderPath, 'fast', 'crystal_ligands')
+        crystal_source = os.path.join(FLAGS.crystal_source, item['PDBname'], item['Id'] + '_ligand.pdb')
+        crystal_dest = os.path.join(crystal_folder, item['PDBname'], item['Id'] + '_ligand.pdb')
+
+        if not os.path.exists(crystal_dest):
+            try_create_chain_parent_folder(crystal_dest)
+            os.system('cp {} {}'.format(crystal_source, crystal_dest))
+
+        # print cmd
+        os.system(cmd)
+
+    def convert_ritor_so(self,item):
+        destPath = os.path.join(self.dockingFolderPath, 'rigor_so', 'docked_ligands')
+
+        sourceFileName = item['Id'] + '_ligand_rigor_so.pdb'
+
+        destFileName = item['Id'] + '_ligand_rigor_so_.pdb'
+
+        sourceFilePath = os.path.join(FLAGS.rigor_so_sourcePath, item['PDBname'], sourceFileName)
+
+        destFilePath = os.path.join(destPath, item['PDBname'], destFileName)
+
+        try_create_chain_parent_folder(destFilePath)
+
+        cmd = 'obabel -ipdb {} -opdb -O {} -m'.format(sourceFilePath, destFilePath)
+
+        receptor_folder = os.path.join(self.dockingFolderPath, 'fast', 'receptors')
+        receptor_source = os.path.join(FLAGS.receptor_source, item['PDBname'], item['PDBname'] + '.pdb')
+        receptor_dest = os.path.join(receptor_folder, item['PDBname'], item['PDBname'] + '.pdb')
+
+        if not os.path.exists(receptor_dest):
+            try_create_chain_parent_folder(receptor_dest)
+            os.system('cp {} {}'.format(receptor_source, receptor_dest))
+
+        crystal_folder = os.path.join(self.dockingFolderPath, 'fast', 'crystal_ligands')
+        crystal_source = os.path.join(FLAGS.crystal_source, item['PDBname'], item['Id'] + '_ligand.pdb')
+        crystal_dest = os.path.join(crystal_folder, item['PDBname'], item['Id'] + '_ligand.pdb')
+
+        if not os.path.exists(crystal_dest):
+            try_create_chain_parent_folder(crystal_dest)
+            os.system('cp {} {}'.format(crystal_source, crystal_dest))
+
+        # print cmd
+        os.system(cmd)
+
     def convert_function(self, item):
         destPath =os.path.join(self.dockingFolderPath,'fast','decked_ligands')
 
@@ -190,6 +258,9 @@ class FLAGS:
     sourcePath = '/n/scratch2/xl198/data/pdbs'
     crystal_source = '/n/scratch2/xl198/data/H/addH'
     receptor_source ='/n/scratch2/xl198/data/H/data'
+
+    rigor_sourcePath = '/n/scratch2/xl198/YI/rigor/final'
+    rigor_so_sourcePath  = '/n/scratch2/xl198/YI/rigor_so/final'
     
     dockSourcePath = '/n/scratch2/xl198/dude/data/dude/pdbs/ligands'
     smina = '/home/xl198/program/smina/smina.static'
@@ -232,4 +303,4 @@ def parse_FLAG():
 if __name__ == '__main__':
     parse_FLAG()
     dockclass = docking('fusion')
-    dockclass.convert('/n/scratch2/xl198/YI/rigor/selected.csv', dockclass.convert_function)
+    dockclass.convert('/n/scratch2/xl198/YI/rigor/selected.csv', dockclass.convert_ritor())

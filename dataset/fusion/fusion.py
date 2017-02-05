@@ -4,6 +4,16 @@ import numpy  as np
 import tempfile
 import re
 from glob import glob
+import prody
+
+
+def merge():
+
+    fast_ligand = os.path.join(FLAGS.fas_path,Id+'_fast.pdb')
+    rigor_ligand = os.path.join(FLAGS.rigor_path,Id+'_rigor.pdb')
+    ritor_so_ligand = os.path.join(FLAGS.rigor_so_path,Id+'_rigor_so.pdb')
+
+
 
 
 

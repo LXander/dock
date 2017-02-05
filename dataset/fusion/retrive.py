@@ -173,22 +173,24 @@ class docking:
 
 
         crystal_folder = os.path.join(self.dockingFolderPath,'fast','crystal_ligands')
-        crystal_source = os.path.join(FLAGS.crystal_source,item['PDBname'],item['PDBname']+'_ligand.pdb')
-        crystal_dest = os.path.join(crystal_folder,item['PDBname'],item['PDbname']+'_ligand.pdb')
+        crystal_source = os.path.join(FLAGS.crystal_source,item['PDBname'],item['Id']+'_ligand.pdb')
+        crystal_dest = os.path.join(crystal_folder,item['PDBname'],item['Id']+'_ligand.pdb')
 
         if not os.path.exists(crystal_dest):
             try_create_chain_parent_folder(crystal_dest)
             os.system('cp {} {}'.format(crystal_source,crystal_dest))
 
-        print cmd
-        #os.system(cmd)
+        #print cmd
+        os.system(cmd)
 
 
 class FLAGS:
     arrayjob = False
     workplace = '/n/scratch2/xl198/data'
-    crystal_source ='/n/scratch2/xl198/data/pdbs'
-    receptor_source = '/n/scratch2/xl198/data/H/addH'
+    sourcePath = '/n/scratch2/xl198/data/pdbs'
+    crystal_source = '/n/scratch2/xl198/data/H/addH'
+    receptor_source ='/n/scratch2/xl198/data/H/data'
+    
     dockSourcePath = '/n/scratch2/xl198/dude/data/dude/pdbs/ligands'
     smina = '/home/xl198/program/smina/smina.static'
     thread_num = 1

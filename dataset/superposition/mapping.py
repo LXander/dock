@@ -51,7 +51,7 @@ def mapping():
 
 class FLAGS:
     crystalFilePath = '/n/scratch2/xl198/data/Superposition/forms/crystal_small.csv'
-    decoyFilePath = '/n/scratch2/xl198/data/Superposition/forms/decoy_atom_num.csv'
+    decoyFilePath = '/n/scratch2/xl198/data/Superposition/forms/decoys_atom_num.csv'
     formsFolder = '/n/scratch2/xl198/data/Superposition/forms'
 
 mapping()

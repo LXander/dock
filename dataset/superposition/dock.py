@@ -153,7 +153,7 @@ class docking:
 
 
 
-        dockDestPath = os.path.join(self.dockingFolderPath)
+        #dockDestPath = os.path.join(self.dockingFolderPath)
         
         receptor = item['receptor']
         ligand_box = item['ligand_box']
@@ -161,17 +161,18 @@ class docking:
 
         cry_id = re.search('\/(?P<id>\w{4}_\d+)_', ligand_box).groupdict()['id']
         cry_rec = cry_id.split('_')[0]
-
-        dec_id = re.search('\/(?P<id>\W+_decoys_\d+).pdb',ligand).groupdict()['id']
+        #print ligand
+        dec_id = re.search('\/(?P<id>[a-zA-Z0-9]+_decoys_\d+).pdb',ligand).groupdict()['id']
 
         destFileName = cry_id+'_'+dec_id+'.pdb'
-        dest_ligand = os.path.join(FLAGS.dockSourcePath,cry_rec,destFileName)
+        dest_ligand = os.path.join(self.dockingFolderPath,cry_rec,destFileName)
         try_create_chain_parent_folder(dest_ligand)
         cmd = "{} -r {} -l {} --autobox_ligand {} -o {} --num_modes=1000 --energy_range=1000 --cpu=1 ".format(FLAGS.smina,receptor,ligand,ligand_box,dest_ligand)
         
+        print cmd
         if not os.path.exists(dest_ligand):
-            print cmd
-            #os.system(cmd)
+            
+            os.system(cmd)
 
 class FLAGS:
     arrayjob = False

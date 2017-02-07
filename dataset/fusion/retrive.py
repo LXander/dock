@@ -162,7 +162,7 @@ class docking:
 
         cmd = 'obabel -ipdb {} -opdb -O {} -m'.format(sourceFilePath, destFilePath)
 
-        receptor_folder = os.path.join(self.dockingFolderPath, 'fast', 'receptors')
+        receptor_folder = os.path.join(self.dockingFolderPath, 'rigor', 'receptors')
         receptor_source = os.path.join(FLAGS.receptor_source, item['PDBname'], item['PDBname'] + '.pdb')
         receptor_dest = os.path.join(receptor_folder, item['PDBname'], item['PDBname'] + '.pdb')
 
@@ -170,7 +170,7 @@ class docking:
             try_create_chain_parent_folder(receptor_dest)
             os.system('cp {} {}'.format(receptor_source, receptor_dest))
 
-        crystal_folder = os.path.join(self.dockingFolderPath, 'fast', 'crystal_ligands')
+        crystal_folder = os.path.join(self.dockingFolderPath, 'rigor', 'crystal_ligands')
         crystal_source = os.path.join(FLAGS.crystal_source, item['PDBname'], item['Id'] + '_ligand.pdb')
         crystal_dest = os.path.join(crystal_folder, item['PDBname'], item['Id'] + '_ligand.pdb')
 
@@ -179,7 +179,7 @@ class docking:
             os.system('cp {} {}'.format(crystal_source, crystal_dest))
 
         # print cmd
-        os.system(cmd)
+        #os.system(cmd)
 
     def convert_ritor_so(self,item):
         destPath = os.path.join(self.dockingFolderPath, 'rigor_so', 'docked_ligands')
@@ -196,7 +196,7 @@ class docking:
 
         cmd = 'obabel -ipdb {} -opdb -O {} -m'.format(sourceFilePath, destFilePath)
 
-        receptor_folder = os.path.join(self.dockingFolderPath, 'fast', 'receptors')
+        receptor_folder = os.path.join(self.dockingFolderPath, 'rigor_so', 'receptors')
         receptor_source = os.path.join(FLAGS.receptor_source, item['PDBname'], item['PDBname'] + '.pdb')
         receptor_dest = os.path.join(receptor_folder, item['PDBname'], item['PDBname'] + '.pdb')
 
@@ -204,7 +204,7 @@ class docking:
             try_create_chain_parent_folder(receptor_dest)
             os.system('cp {} {}'.format(receptor_source, receptor_dest))
 
-        crystal_folder = os.path.join(self.dockingFolderPath, 'fast', 'crystal_ligands')
+        crystal_folder = os.path.join(self.dockingFolderPath, 'rigor_so', 'crystal_ligands')
         crystal_source = os.path.join(FLAGS.crystal_source, item['PDBname'], item['Id'] + '_ligand.pdb')
         crystal_dest = os.path.join(crystal_folder, item['PDBname'], item['Id'] + '_ligand.pdb')
 
@@ -303,4 +303,4 @@ def parse_FLAG():
 if __name__ == '__main__':
     parse_FLAG()
     dockclass = docking('fusion')
-    dockclass.convert('/n/scratch2/xl198/YI/rigor/selected.csv', dockclass.convert_ritor())
+    dockclass.convert('/n/scratch2/xl198/YI/rigor/selected.csv', dockclass.convert_ritor_so)

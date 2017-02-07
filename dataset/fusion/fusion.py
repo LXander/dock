@@ -32,7 +32,7 @@ def tanimoto(item):
     os.system(cmd)
 
     # Calculate tanimoto similarity for all crystal ligand for the receptor
-    crystal_list = glob(os.path.join(FLAGS.crystalPath),item['PDBname'],"*.pdb")
+    crystal_list = glob(os.path.join(FLAGS.crystalPath,item['PDBname'],"*.pdb"))
 
     tanimoto_list =[]
 

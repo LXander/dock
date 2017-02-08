@@ -38,14 +38,15 @@ def convert(receptor):
 
     # Receptor
     receptorSource = os.path.join(sourceBase,receptor,'receptor.pdb')
-    createFolder(os.path.join(destBase,'addh_receptors'))
-    receptorDest = os.path.join(destBase,'addh_receptors',receptor+'.pdb')
-    receptorCmd = "obabel -ipdb {} -opdb -O {} -h ".format(receptorSource,receptorDest)
+    createFolder(os.path.join(destBase,'YI_addh_receptors'))
+    receptorDest = os.path.join(destBase,'YI_addh_receptors',receptor+'.pdb')
+    #receptorCmd = "obabel -ipdb {} -opdb -O {} -h ".format(receptorSource,receptorDest)
     # snima can't parse receptor converted by obabel
     # prody can't parse original receptor from dude
     #receptorCmd = "cp {} {}".format(receptorSource,receptorDest)
+    receptorCmd =  'obminimize -cg -ff MMFF94 -h -n 500 {} > {}'.format(receptorSource,receptorDest)
     os.popen(receptorCmd)
-
+    print receptorCmd
     # Crystal
     crystalSource = os.path.join(sourceBase,receptor,'crystal_ligand.mol2')
     crystalDestFolder = os.path.join(destBase,'crystal_ligands',receptor)
@@ -65,7 +66,7 @@ def convert(receptor):
     createFolder(activesDestFolder)
     activesDestFile = os.path.join(activesDestFolder,receptor+'_actives_.pdb')
     activesCmd = 'obabel -imol2 {} -opdb -O {} -m'.format(activesMol2,activesDestFile)
-    os.popen(activesCmd)
+    #os.popen(activesCmd)
 
     # Decoys
     decoysGz = os.path.join(sourceBase,receptor,'decoys_final.mol2.gz')
@@ -76,7 +77,7 @@ def convert(receptor):
     createFolder(decoysDestFolder)
     decoysDestFile = os.path.join(decoysDestFolder,receptor+'_decoys_.pdb')
     decoysCmd = 'obabel -imol2 {} -opdb -O {} -m'.format(decoysMol2,decoysDestFile)
-    print decoysCmd
+    #print decoysCmd
     #os.popen(decoysCmd)
 
 def runs():

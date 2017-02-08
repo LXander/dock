@@ -15,7 +15,7 @@ def calculate(filePath):
     first_position = score_file[score_file['inner_id']==1]
     sorted_position = first_position.sort('energy')
     sorted_position['label'] = sorted_position['filename'].apply(lambda x:1 if x.find('actives')>=0 else 0)
-    labels = list(sorted_res['label'])
+    labels = list(sorted_position['label'])
 
     points = []
     total = len(labels)
@@ -28,16 +28,21 @@ def calculate(filePath):
     auc = np.trapz(np_points[:, 0], x=np_points[:, 1])
 
     with open(FLAGS.auc_log_file,'a') as fout:
-        fout.write(filename.split('.')+ '\t'+str(auc)+'\n')
+        fout.write(filename.split('.')[0]+ '\t'+str(auc)+'\n')
 
-    df = pd.DataFrame(data = np.points,columns=['tpr','fpr'])
+    df = pd.DataFrame(data = np_points,columns=['tpr','fpr'])
     df.to_csv(os.path.join(FLAGS.destPath,filename.replace('.','_curve.')))
 
 
 
-def run():
+def run(index=None):
     fileNameList = os.listdir(FLAGS.sourcePath)
-    map(lambda filename:calculate(os.path.join(FLAGS.sourcePath,filename)),fileNameList)
+    print "index ",index
+    if not index==None:
+        print "index ",index
+        calculate(os.path.join(FLAGS.sourcePath,fileNameList[index]))
+    else: 
+        map(lambda filename:calculate(os.path.join(FLAGS.sourcePath,filename)),fileNameList)
 
 class FLAGS:
     sourcePath = '/n/scratch2/xl198/dude/frame/affinity'
@@ -45,5 +50,12 @@ class FLAGS:
     destPath = '/n/scratch2/xl198/dude/frame/curve'
 
 if __name__ == '__main__':
-    run
+    args = sys.argv
+    print args 
+    if len(args)>1:
+        index =int(args[1])
+        print "index ",index
+    	run(index)
+    else:    
+        run()
 

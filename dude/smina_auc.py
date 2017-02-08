@@ -2,7 +2,7 @@ import os,sys
 import pandas as pd
 import numpy as np
 
-def calculate_mean(filePath,k):
+def calculate_mean(filePath,k=10):
     '''
     columns in the file filename,inner_id,energy
     :param filePath:
@@ -81,13 +81,13 @@ def run(index=None):
     print "index ",index
     if not index==None:
         print "index ",index
-        calculate(os.path.join(FLAGS.sourcePath,fileNameList[index]))
+        calculate_mean(os.path.join(FLAGS.sourcePath,fileNameList[index]))
     else: 
-        map(lambda filename:calculate(os.path.join(FLAGS.sourcePath,filename)),fileNameList)
+        map(lambda filename:calculate_mean(os.path.join(FLAGS.sourcePath,filename)),fileNameList)
 
 class FLAGS:
     sourcePath = '/n/scratch2/xl198/dude/frame/affinity'
-    destPath = '/n/scratch2/xl198/dude/frame/curve'
+    destPath = '/n/scratch2/xl198/dude/frame/mean_curve'
     auc_log_file = os.path.join(destPath,'mean_auc.txt')
 
 if __name__ == '__main__':

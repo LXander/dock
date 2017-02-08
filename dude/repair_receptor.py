@@ -2,8 +2,8 @@ import os,sys
 from glob import glob
 
 def add_hydrogen(filePath):
-    fileName = os.path.basenaem(filePath)
-    receptorName=  fileName.split('.')
+    fileName = os.path.basename(filePath)
+    receptorName=  fileName.split('.')[0]
 
     with open('repair.sh', 'w') as w:
         w.write('# !/bin/bash\n')
@@ -32,4 +32,4 @@ def add_one():
 
 
 
-add_one()
+add_all()

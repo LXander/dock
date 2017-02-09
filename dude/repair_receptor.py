@@ -9,7 +9,7 @@ def add_hydrogen(filePath):
         w.write('# !/bin/bash\n')
         w.write('# BSUB -n 2\n')
         w.write('# BSUB -W 100:00\n')
-        w.write('# BSUB -R "rusage[mem=10000]"\n')
+        w.write('# BSUB -R "rusage[mem=40000]"\n')
         w.write('# BSUB -J reapir_{}\n'.format(receptorName))
         w.write('# BSUB -o /home/xl198/code/bucket/{}.out\n'.format(receptorName))
         w.write('# BSUB -e /home/xl198/code/bucket/{}.err\n'.format(receptorName))

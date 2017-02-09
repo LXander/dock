@@ -115,7 +115,9 @@ def parseLigand(fast_file_path):
             sys.stderr.write(message)
             raise Exception(message)
 
-
+    # coord read by mdtraj is 10 times smaller than 
+    # literally record in the pdb file
+    coords = coords*10
     return coords,atom_type,affinity
 
 
@@ -125,7 +127,9 @@ def overlap_filter(crystal_list, ligand_coords, ligand_affinity):
     for crystal_ligand_path in crystal_list:
         crystal_ligand = md.load(crystal_ligand_path)
         # the shape of crystal coords is [1,n,3]
-        crysta_coords = crystal_ligand.xyz
+        # coordinate read by mdtraj is 10 time less than 
+        # literally so we times it by 10
+        crysta_coords = crystal_ligand.xyz*10
 
         # [x,y,1,1,3]
         exp_ligand_coord = np.expand_dims(np.expand_dims(ligand_coords, -2), -2)
@@ -142,6 +146,7 @@ def overlap_filter(crystal_list, ligand_coords, ligand_affinity):
         # [x]
         ligand_not_overlap = np.mean(np.squeeze(atom_overlap),-1)<FLAGS.clash_size_cutoff
         print "ligand_not_overlap num",np.sum(ligand_not_overlap)
+        print crystal_ligand_path
         ligand_coords = ligand_coords[ligand_not_overlap]
         ligand_affinity = ligand_affinity[ligand_not_overlap]
 

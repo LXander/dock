@@ -69,7 +69,7 @@ def parsePDB(file_path):
     #remarks = [line for line in open(file_path) if line[:6]=='REMARK' ]
     #affinity = [float(re.search(r'-?\d+.\d+',remark).group()) for remark in remarks]
 
-    if len(affinity) != len(atom_type):
+    if len(affinity) != traj.n_frames:
         message ='Error when parse {}, fram num {}, affinity {}\n'.format(file_path,traj.n_frames,len(affinity))
         sys.stderr.write(message)
         raise Exception(message)
@@ -181,6 +181,9 @@ def convert(fast_file_path):
     similar_crystal = get_similar_crystal_file(crystalFolder,fast_file_path)
 
     ligand_coords,ligand_atom_type,ligand_afinity = parseLigand(fast_file_path)
+
+    print 'parsed {} , shape'.format(fast_name)
+    print ligand_coords.shape
 
     filtered_coords,filtered_affinity = overlap_filter(similar_crystal,ligand_coords,ligand_afinity)
 

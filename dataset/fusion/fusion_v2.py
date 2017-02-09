@@ -141,7 +141,7 @@ def overlap_filter(crystal_list, ligand_coords, ligand_affinity):
         print "atom_overlap ",atom_overlap.shape
         # [x]
         ligand_not_overlap = np.mean(np.squeeze(atom_overlap),-1)<FLAGS.clash_size_cutoff
-        print "ligand_not_overlap ",ligand_not_overlap.shape
+        print "ligand_not_overlap num",np.sum(ligand_not_overlap)
         ligand_coords = ligand_coords[ligand_not_overlap]
         ligand_affinity = ligand_affinity[ligand_not_overlap]
 

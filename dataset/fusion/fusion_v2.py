@@ -121,6 +121,7 @@ def parseLigand(fast_file_path):
 
 def overlap_filter(crystal_list, ligand_coords, ligand_affinity):
 
+
     for crystal_ligand_path in crystal_list:
         crystal_ligand = md.load(crystal_ligand_path)
         # the shape of crystal coords is [1,n,3]
@@ -128,15 +129,19 @@ def overlap_filter(crystal_list, ligand_coords, ligand_affinity):
 
         # [x,y,1,1,3]
         exp_ligand_coord = np.expand_dims(np.expand_dims(ligand_coords, -2), -2)
+        print "exp_ligand_coord ",exp_ligand_coord.shape
         # [x,y,1,n,3]
         diff = exp_ligand_coord - crysta_coords
+        print "diff ",diff.shape
         # [x,y,n]
         distance = np.squeeze(np.sqrt(np.sum(np.square(diff),-1)))
+        print "distance ",distance.shape
         # [x,y]
         atom_overlap =(np.sum((distance<FLAGS.clash_cutoff_A).astype(np.float32),-1)>0).astype(np.float32)
+        print "atom_overlap ",atom_overlap.shape
         # [x]
         ligand_not_overlap = np.mean(np.squeeze(atom_overlap),-1)<FLAGS.clash_size_cutoff
-
+        print "ligand_not_overlap ",ligand_not_overlap.shape
         ligand_coords = ligand_coords[ligand_not_overlap]
         ligand_affinity = ligand_affinity[ligand_not_overlap]
 

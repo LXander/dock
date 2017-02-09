@@ -55,9 +55,19 @@ def parsePDB(file_path):
     coords = traj.xyz
     atom_type = [atom.name for atom in traj.topology.atoms]
 
+    file_name = os.path.basename(file_path).split('.')[0]
+    file_id = re.search('([a-zA-Z0-9]{4}_\d+)',file_name).group()
+    file_dataset = re.search('ligand_(.+)$', file_name).groups()[0]
+    if file_id == None or file_dataset == None:
+        message = "cannot parse Id or dataset for {}".format(file_path)
+        raise(message)
 
-    remarks = [line for line in open(file_path) if line[:6]=='REMARK' ]
-    affinity = [float(re.search(r'-?\d+.\d+',remark).group()) for remark in remarks]
+    select_by_id = FLAGS.dataframe[FLAGS.dataframe['ID'] == file_id]
+    select_by_dataset = select_by_id[select_by_id['dataset'] == file_dataset ]
+    affinity = np.array(select_by_dataset['smina_score'])
+
+    #remarks = [line for line in open(file_path) if line[:6]=='REMARK' ]
+    #affinity = [float(re.search(r'-?\d+.\d+',remark).group()) for remark in remarks]
 
     if len(affinity) != len(atom_type):
         message ='Error when parse {}, fram num {}, affinity {}\n'.format(file_path,traj.n_frames,len(affinity))
@@ -203,6 +213,7 @@ class FLAGS:
     rigor_so_path = '/n/scratch2/xl198/YI/rigor_so/final'
     mix_path = '/n/scratch2/xl198/data/fusion/dock'
     crystalPath = '/n/scratch2/xl198/data/H/addH'
+    dataframe =pd.read_csv("/n/scratch2/xl198/data/fusion/forms/simple_mix.csv")
 
     tanimoto_cutoff = 0.75
     clash_cutoff_A = 4

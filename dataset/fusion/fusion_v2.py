@@ -6,8 +6,10 @@ import re
 from glob import glob
 import mdtraj as md
 import getopt
+from av4_atomdict import atom_dictionary
 sys.path.append(os.path.dirname(os.path.dirname(sys.path[0])))
 from util.createfolder import try_create_chain_parent_folder
+
 
 
 def get_similar_crystal_file(crystalFolder,ligandPath):
@@ -53,7 +55,7 @@ def parsePDB(file_path):
 
     traj = md.load(file_path)
     coords = traj.xyz
-    atom_type = [atom.name for atom in traj.topology.atoms]
+    atom_type = [ atom_dictionary.ATM[atom.name.lower()] for atom in traj.topology.atoms]
 
     file_name = os.path.basename(file_path).split('.')[0]
     file_id = re.search('([a-zA-Z0-9]{4}_\d+)',file_name).group()

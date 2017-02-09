@@ -202,7 +202,7 @@ class FLAGS:
     rigor_path = '/n/scratch2/xl198/YI/rigor/final'
     rigor_so_path = '/n/scratch2/xl198/YI/rigor_so/final'
     mix_path = '/n/scratch2/xl198/data/fusion/dock'
-
+    crystalPath = '/n/scratch2/xl198/data/H/addH'
 
     tanimoto_cutoff = 0.75
     clash_cutoff_A = 4

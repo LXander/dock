@@ -24,6 +24,7 @@ def get_similar_crystal_file(crystalFolder,ligandPath):
 
     file_name= os.path.basename(ligandPath)
     temp_file_path = os.path.join(FLAGS.tempPath,file_name)
+    print 'obabel convert ',file_name
     obabel_cmd = 'obabel -ipdb {} -l 1 -f 1 -opdb -O {}'.format(ligandPath,temp_file_path)
     os.system(obabel_cmd)
 
@@ -71,10 +72,17 @@ def parsePDB(file_path):
     #remarks = [line for line in open(file_path) if line[:6]=='REMARK' ]
     #affinity = [float(re.search(r'-?\d+.\d+',remark).group()) for remark in remarks]
 
+    if len(affinity) == 0:
+        # if cannot find value in dataframe return None and ignore it
+        message = "Error when parsing {}\n failed find affinity infomation in the dataframe.\n".format(file_path)
+        sys.stderr.write(message)
+        return None,None,None
     if len(affinity) != traj.n_frames:
+        # if can find value in dataframe but with different size, raise an Exception
         message ='Error when parse {}, fram num {}, affinity {}\n'.format(file_path,traj.n_frames,len(affinity))
         sys.stderr.write(message)
         raise Exception(message)
+
 
     else:
         return coords,atom_type,affinity
@@ -99,7 +107,10 @@ def parseLigand(fast_file_path):
 
     if os.path.exists(rigor_file_path):
         rigor_coords,rigor_atom_type,rigor_affinity = parsePDB(rigor_file_path)
-        if rigor_atom_type == atom_type:
+        if rigor_coords == None:
+            # if failed to parse PDB just ignore it
+            pass
+        elif rigor_atom_type == atom_type:
             coords =np.concatenate((coords,rigor_coords))
             affinity = np.concatenate((affinity,rigor_affinity))
         else:
@@ -109,7 +120,10 @@ def parseLigand(fast_file_path):
 
     if os.path.exists(rigor_so_file_path):
         rigor_so_coords,rigor_so_atom_type,rigor_so_affinity = parsePDB(rigor_so_file_path)
-        if rigor_so_atom_type == atom_type:
+        if rigor_so_coords == None:
+            # if failed to parse PDB just ignore it
+            pass
+        elif rigor_so_atom_type == atom_type:
             coords = np.concatenate((coords,rigor_so_coords))
             affinity = np.concatenate((affinity,rigor_so_affinity))
         else:
@@ -121,7 +135,6 @@ def parseLigand(fast_file_path):
     # literally record in the pdb file
     coords = coords*10
     return coords,atom_type,affinity
-
 
 def overlap_filter(crystal_list, ligand_coords, ligand_affinity):
 

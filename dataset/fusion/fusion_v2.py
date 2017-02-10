@@ -168,7 +168,7 @@ def save_av4(filepath,labels,elements,multiframe_coords):
     concatenated_coords = np.asarray(concatenated_coords,dtype=np.float32)
 
     if not(int(len(concatenated_coords[:,0])==int(len(elements)))):
-        raise Exception('Number of atom elements is not equal, multi')
+        raise Exception('Number of atom elements is not equal, elements num {}, coords size {}'.format(len(elements),len(concatenated_coords[:,0])))
 
     if not(int(len(concatenated_coords[0,:])==int(3*len(labels)))):
         raise Exception('Number labels is not equal to the number of coordinate frames')

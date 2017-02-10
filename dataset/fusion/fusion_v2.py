@@ -161,7 +161,7 @@ def overlap_filter(crystal_list, ligand_coords, ligand_affinity):
 def save_av4(filepath,labels,elements,multiframe_coords):
     concatenated_coords = multiframe_coords[0]
     for coords in multiframe_coords[1:]:
-        concatenated_coords = np.concatenate((concatenated_coords,coords))
+        concatenated_coords = np.hstack((concatenated_coords,coords))
 
     labels = np.asarray(labels*100,dtype=np.int32)
     elements = np.asarray(elements,dtype=np.int32)

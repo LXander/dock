@@ -44,6 +44,7 @@ class parseRCSB:
         
         address = self.address(item)
         if os.path.exists(os.path.join(FLAGS.rowdata_folder,item+'.pdb')):
+            print item," exists"
             return None
         print 'download ',item
         os.system('wget -P {}  {}'.format(FLAGS.rowdata_folder,address))
@@ -60,7 +61,9 @@ class parseRCSB:
         
         hetero = parsed.select('(hetero and not water) or resname ATP or resname ADP')
         receptor = parsed.select('protein or nucleic')
-
+        if receptor is None:
+            self.error_log("{} doesn't have receptor.\n".format(item))
+            return None
         if hetero is None:
             self.error_log("{} doesn't have ligand.\n".format(item))
             return None

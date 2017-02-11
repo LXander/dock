@@ -12,14 +12,16 @@ from util.createfolder import try_create_chain_parent_folder,try_create_chain_fo
 
 class parseRCSB:
 
-    def __init__(self, folerName):
+    def __init__(self):
         '''
         Create folder for kaggle dataset
         tempFolderPath used to store intermediate csv file
         kaggleBasePath used to store converted and coded data
         :param folerName:
         '''
-        test = 0
+        self.thread_num = FLAGS.thread_num
+        self.process_num = FLAGS.process_num
+        self.address = lambda PDB:'https://files.rcsb.org/download/'+PDB+'.pdb'
 
 
     def write_dataframe(self, dataframe, filename):
@@ -39,9 +41,12 @@ class parseRCSB:
 
     def downloads(self,item):
 
-        os.system('cd {}'.format(FLAGS.rowdata_folder))
-        address = FLAGS.address(item)
-        os.system('wget {}'.format(address))
+        
+        address = self.address(item)
+        if os.path.exists(os.path.join(FLAGS.rowdata_folder,item+'.pdb')):
+            return None
+        print 'download ',item
+        os.system('wget -P {}  {}'.format(FLAGS.rowdata_folder,address))
 
         pdbname = item.lower()
         ligand_folder = os.path.join(FLAGS.splited_ligand_folder,pdbname)
@@ -52,10 +57,13 @@ class parseRCSB:
         except:
             self.error_log('can not parse {}.\n'.format(item))
             return None
-
+        
         hetero = parsed.select('(hetero and not water) or resname ATP or resname ADP')
         receptor = parsed.select('protein or nucleic')
 
+        if hetero is None:
+            self.error_log("{} doesn't have ligand.\n".format(item))
+            return None
         ligand_flags = False
         for each in prody.HierView(hetero).iterResidues():
             if each.numAtoms() <= 10:
@@ -71,7 +79,7 @@ class parseRCSB:
             receptor_path = os.path.join(FLAGS.splited_receptor_folder,pdbname+'.pdb')
             prody.writePDB(receptor_path,receptor)
         else:
-            self.error_log("{} doesn't convert, not ligand have more than 10 atoms.\n")
+            self.error_log("{} doesn't convert, not ligand have more than 10 atoms.\n".format(item))
 
 
 
@@ -100,7 +108,7 @@ class parseRCSB:
         if not os.path.exists(dest_file_path):
             os.popen(cmd)
 
-    def thread_convert(self, func, dataframe, coded, index):
+    def thread_convert(self, func, dataframe, index):
         '''
         job running in thread
         :param func: function running in single thread
@@ -111,7 +119,7 @@ class parseRCSB:
         '''
         for i in index:
             # print "dataframe size: {}, ix {}".format(len(dataframe),i)
-            func(dataframe[i], coded)
+            func(dataframe[i])
 
     def process_convert(self, func, dataframe, index):
 
@@ -161,14 +169,15 @@ class parseRCSB:
 
 
 
-        if FLAGS.orchestra_arrayjob:
-            jobsize = FLAGS.orchestra_jobsize
-            jobid = FLAGS.orchestra_jobid
+        if hasattr(FLAGS,'arrayjob') and FLAGS.arrayjob:
+            jobsize = FLAGS.jobsize
+            jobid = FLAGS.jobid
 
             # using iloc to slice dataframe result doesn't contains end [start,end)
             linspace = np.linspace(0, len(FLAGS.pdb_list), jobsize + 1).astype(int)
             dataframe = FLAGS.pdb_list[linspace[jobid - 1]:linspace[jobid]]
-
+        else:
+            dataframe = FLAGS.pdb_list
         print "dataframe size ", len(dataframe)
 
         # when there's not enough entry to comvert , decrease thread's num
@@ -202,10 +211,9 @@ class FLAGS:
     rowdata_folder = os.path.join(workplace,'row')
     splited_receptor_folder = os.path.join(workplace,'row_receptor')
     splited_ligand_folder = os.path.join(workplace,'ligands')
-    address = lambda PDB:'https://files.rcsb.org/download/'+PDB+'.pdb'
     log_file = 'error.log'
-    thread_num = 16
-    process_num = 12
+    thread_num = 1
+    process_num = 1
 
 
 
@@ -238,13 +246,14 @@ def parse_FLAG():
     if hasattr(FLAGS,"jobsize") and hasattr(FLAGS,"jobid"):
         FLAGS.arrayjob = True
 
-    print "orchestra job ",FLAGS.arrayjob
+    if hasattr(FLAGS,'arrayjob'):
+        print "orchestra job ",FLAGS.arrayjob
 
     if hasattr(FLAGS,'cores'):
         print "cores num ",FLAGS.cores
 
 
-    content = open('target_PDB.txt').readline()
+    content = open('/home/xl198/code/dock/downloads/target_PDB.txt').readline()
     content = content.split(',')
     content = map(lambda x:x.strip(),content)
     FLAGS.pdb_list= content

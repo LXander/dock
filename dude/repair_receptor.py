@@ -11,16 +11,16 @@ def add_hydrogen(filePath):
         w.write('# BSUB -W 100:00\n')
         w.write('# BSUB -R "rusage[mem=40000]"\n')
         w.write('# BSUB -J reapir_{}\n'.format(receptorName))
-        w.write('# BSUB -o /home/xl198/code/bucket/{}.out\n'.format(receptorName))
-        w.write('# BSUB -e /home/xl198/code/bucket/{}.err\n'.format(receptorName))
+        w.write('# BSUB -o /home/xl198/code/bucket/repair/{}.out\n'.format(receptorName))
+        w.write('# BSUB -e /home/xl198/code/bucket/repair/{}.err\n'.format(receptorName))
         w.write('# BSUB -q long\n')
         #w.write('export PATH =$PATH:/home/yw174/usr/babel/bin/\n')
         #w.write('cd /home/yw174/program/pdb_sth\n')
-        cmd = 'obminimize -cg -ff MMFF94 -h -n 500 {} > {}'.format(filePath,filePath.replace("protein","repair"))
+        cmd = 'obminimize -cg -ff MMFF94 -h -n 500 -o pdb  {} > {}'.format(filePath,filePath.replace("protein","repair"))
         w.write(cmd + '\n')
 
-    if len(open(filePath.replace("protein","repair")).readlines())==0:
-        os.system('bsub < repair.sh')
+    #if len(open(filePath.replace("protein","repair")).readlines())==0:
+    os.system('bsub < repair.sh')
 
 def add_all():
     for receptor in glob(os.path.join('/n/scratch2/xl198/dude/data/receptor/protein','*.pdb')):

@@ -6,6 +6,8 @@ import pandas as pd
 import numpy  as np
 import multiprocessing
 import threading
+from glob import glob
+
 sys.path.append(os.path.dirname(sys.path[0]))
 from util.createfolder import try_create_chain_parent_folder,try_create_chain_folder
 
@@ -21,33 +23,30 @@ class parseRCSB:
         '''
         self.thread_num = FLAGS.thread_num
         self.process_num = FLAGS.process_num
-        self.address = lambda PDB:'https://files.rcsb.org/download/'+PDB+'.pdb'
-
-
-    def write_dataframe(self, dataframe, filename):
-        '''
-        Write dataframe to tempFolderPath
-        :param dataframe: pandas DataFrame
-        :param filename:  name of output file without suffix
-        :return:
-        '''
-        dataframe.to_csv(os.path.join(self.tempFolderPath, filename + '.csv'), index=False)
+        self.get_address = lambda PDB: 'https://files.rcsb.org/download/' + PDB + '.pdb'
 
 
     def error_log(self,content):
         with open(FLAGS.log_file,'a') as fout:
             fout.write(content)
 
+    def repair(self,item):
+        destfile = item.replace(FLAGS.splited_receptor_folder,FLAGS.repaired_receptor_folder)
+
+        print destfile
+        cmd = 'obminimize -cg -ff MMFF94 -h -n 500 -o pdb  {} > {}'.format(item,destfile)
+        os.system(cmd)
+
+    def docking(self,item):
+        
 
     def downloads(self,item):
-
-        
-        address = self.address(item)
+        download_address = self.get_address(item)
         if os.path.exists(os.path.join(FLAGS.rowdata_folder,item+'.pdb')):
             print item," exists"
             return None
         print 'download ',item
-        os.system('wget -P {}  {}'.format(FLAGS.rowdata_folder,address))
+        os.system('wget -P {}  {}'.format(FLAGS.rowdata_folder,download_address))
 
         pdbname = item.lower()
         ligand_folder = os.path.join(FLAGS.splited_ligand_folder,pdbname)
@@ -84,8 +83,6 @@ class parseRCSB:
         else:
             self.error_log("{} doesn't convert, not ligand have more than 10 atoms.\n".format(item))
 
-
-
     def entry_convert(self, item, coded):
         '''
         original pdb file contains multiple frames
@@ -104,10 +101,9 @@ class parseRCSB:
 
         cmd = 'obabel -ipdb {} -f {} -l {} -opdb -O {}'.format(source_file_path, Id, Id, dest_file_path)
 
-        try:
-            create_chain_parent_folder(dest_file_path)
-        except:
-            pass
+
+        try_create_chain_parent_folder(dest_file_path)
+
         if not os.path.exists(dest_file_path):
             os.popen(cmd)
 
@@ -185,10 +181,10 @@ class parseRCSB:
 
         # when there's not enough entry to comvert , decrease thread's num
         if len(dataframe) < self.process_num * self.thread_num:
-
             for i in range(len(dataframe)):
                 convert_func(dataframe[i])
             return
+
         edge = np.linspace(0, len(dataframe), self.process_num + 1).astype(int)
         process_list = [multiprocessing.Process(target=self.process_convert,
                                                 args=(convert_func,
@@ -208,12 +204,15 @@ class parseRCSB:
 
 
 
+
+
 class FLAGS:
 
     workplace = '/n/scratch2/xl198/data/rcsb'
     rowdata_folder = os.path.join(workplace,'row')
     splited_receptor_folder = os.path.join(workplace,'row_receptor')
     splited_ligand_folder = os.path.join(workplace,'ligands')
+    repaired_receptor_folder = os.path.join(workplace,'repaired_receptor')
     log_file = 'error.log'
     thread_num = 1
     process_num = 1
@@ -256,10 +255,11 @@ def parse_FLAG():
         print "cores num ",FLAGS.cores
 
 
-    content = open('/home/xl198/code/dock/downloads/target_PDB.txt').readline()
-    content = content.split(',')
-    content = map(lambda x:x.strip(),content)
-    FLAGS.pdb_list= content
+    #content = open('/home/xl198/code/dock/downloads/target_PDB.txt').readline()
+    #content = content.split(',')
+    #content = map(lambda x:x.strip(),content)
+    #FLAGS.pdb_list= content
+    FLAGS.pdb_list = glob(os.path.join(FLAGS.splited_receptor_folder,"*.pdb"))
 
 
 if __name__ == '__main__':

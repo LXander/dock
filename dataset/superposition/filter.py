@@ -7,10 +7,10 @@ from glob import glob
 import mdtraj as md
 import prody
 import getopt
-from av4_atomdict import atom_dictionary
+
 sys.path.append(os.path.dirname(os.path.dirname(sys.path[0])))
 from util.createfolder import try_create_chain_parent_folder
-
+from av4.av4_atomdict import atom_dictionary
 
 
 def get_similar_crystal_file(crystalFolder,ligandPath):
@@ -57,76 +57,30 @@ def parsePDB(file_path):
 
     lig = prody.parsePDB(file_path)
     coords = lig.getCoordsets()
-    atom_type = lig.getElements()
+    elements = lig.getElements()
 
-    file_name = os.path.basename(file_path).split('.')[0]
-    file_id = re.search('([a-zA-Z0-9]{4}_\d+)',file_name).group()
-    file_dataset = re.search('ligand_(.+)$', file_name).groups()[0]
-    if file_id == None or file_dataset == None:
-        message = "cannot parse Id or dataset for {}".format(file_path)
+
+
+    remarks = [line for line in open(file_path) if line[:6] == 'REMARK']
+    affinity = [float(re.search('(-?\d+.\d+)',reamrk).group()) for reamrk in remarks]
+
+    if coords.shape[0] != len(affinity):
+        message = "{} parse error, frame {}, affinity {}".format(file_path,coords.shape[0],len(affinity))
         raise(message)
 
-
-    return coords,atom_type
-
-def parseLigand(fast_file_path):
-    '''
-    get the ligand's coordinate of whole protein fast docking, whole rigorous docking
-    and site only rigorous docking
-    :param fast_file_path:
-    :return: coords,atom_type,affinity
-    '''
-    fast_name = os.path.basename(fast_file_path)
-    receptor = fast_name.split('_')[0]
-    original_name = fast_name.replace('ligand_fast','ligand')
-    rigor_name= fast_name.replace('ligand_fast','ligand_rigor')
-    rigor_so_name = fast_name.replace('ligand_fast','ligand_rigor_so')
-
-    rigor_file_path = os.path.join(FLAGS.rigor_path,receptor,rigor_name)
-    rigor_so_file_path= os.path.join(FLAGS.rigor_so_path,receptor,rigor_so_name)
-
-    coords,atom_type,affinity= parsePDB(fast_file_path)
-
-    if os.path.exists(rigor_file_path):
-        rigor_coords,rigor_atom_type,rigor_affinity = parsePDB(rigor_file_path)
-        if rigor_coords == None:
-            # if failed to parse PDB just ignore it
-            pass
-        elif rigor_atom_type == atom_type:
-            coords =np.concatenate((coords,rigor_coords))
-            affinity = np.concatenate((affinity,rigor_affinity))
-        else:
-            message = 'different atom type for {} and {}\n'.format(fast_name,rigor_name)
-            sys.stderr.write(message)
-            raise Exception(message)
-
-    if os.path.exists(rigor_so_file_path):
-        rigor_so_coords,rigor_so_atom_type,rigor_so_affinity = parsePDB(rigor_so_file_path)
-        if rigor_so_coords == None:
-            # if failed to parse PDB just ignore it
-            pass
-        elif rigor_so_atom_type == atom_type:
-            coords = np.concatenate((coords,rigor_so_coords))
-            affinity = np.concatenate((affinity,rigor_so_affinity))
-        else:
-            message = 'different atom type for {} and {}\n'.format(fast_name,rigor_so_name)
-            sys.stderr.write(message)
-            raise Exception(message)
-
-    # coord read by mdtraj is 10 times smaller than
-    # literally record in the pdb file
-    coords = coords*10
-    return coords,atom_type,affinity
+    return coords,elements,affinity
 
 def overlap_filter(crystal_list, ligand_coords, ligand_affinity):
 
 
     for crystal_ligand_path in crystal_list:
-        crystal_ligand = md.load(crystal_ligand_path)
+        crystal_ligand = prody.parsePDB(crystal_ligand_path)
         # the shape of crystal coords is [1,n,3]
         # coordinate read by mdtraj is 10 time less than
         # literally so we times it by 10
-        crysta_coords = crystal_ligand.xyz*10
+
+        # [n,3]
+        crysta_coords = crystal_ligand.getCoords()
 
         # [x,y,1,1,3]
         exp_ligand_coord = np.expand_dims(np.expand_dims(ligand_coords, -2), -2)
@@ -177,45 +131,25 @@ def save_av4(filepath,labels,elements,multiframe_coords):
     f.write(av4_record)
     f.close()
 
-def convert(fast_file_path):
-
-    fast_name = os.path.basename(fast_file_path)
-    mix_name = fast_name.replace('ligand_fast','ligand_mix')
-    mix_name = mix_name.replace('.pdb','.av4')
-    receptor = fast_name.split('_')[0]
-
-    crystalFolder = os.path.join(FLAGS.crystalPath, receptor)
-    similar_crystal = get_similar_crystal_file(crystalFolder,fast_file_path)
-
-    ligand_coords,ligand_atom_type,ligand_afinity = parseLigand(fast_file_path)
-
-    print 'parsed {} , shape'.format(fast_name)
-    print ligand_coords.shape
-
-    filtered_coords,filtered_affinity = overlap_filter(similar_crystal,ligand_coords,ligand_afinity)
-
-
-    mix_dest_path = os.path.join(FLAGS.mix_path,receptor,mix_name)
-
-    try_create_chain_parent_folder(mix_dest_path)
-
-    save_av4(mix_dest_path,filtered_affinity,ligand_atom_type,filtered_coords)
 
 def convert(fast_path):
     file_name = os.path.basename(fast_path)
+
+    dest_name = file_name.replace('.pdb', '.av4')
     file_id = re.search('(^[a-zA-Z0-9]{4}_\d+)', file_name).group()
     receptor = file_name.split('_')[0]
 
     crystalFolder = os.path.join(FLAGS.crystalPath, receptor)
-
     similar_crystal = get_similar_crystal_file(crystalFolder, fast_path)
-    lig = prody.parsePDB(fast_path)
-    lig_coords = lig.getCoordsets()
-    lig_elements = lig.getElements()
+    lig_coords,lig_elements,lig_affinity = parsePDB()
 
+    filtered_coords, filtered_affinity = overlap_filter(similar_crystal,lig_coords,lig_affinity)
 
+    av4_dest_path = os.path.join(FLAGS.super_dest_path,receptor,dest_name)
 
+    try_create_chain_parent_folder(av4_dest_path)
 
+    save_av4(av4_dest_path, filtered_affinity, lig_elements, filtered_coords)
 
 
 
@@ -244,10 +178,10 @@ class FLAGS:
     mix_path = '/n/scratch2/xl198/data/fusion/dock'
     crystalPath = '/n/scratch2/xl198/data/H/addH'
     dataframe =pd.read_csv("/n/scratch2/xl198/data/fusion/forms/simple_mix.csv")
-
+    super_dest_path = '/n/scratch2/xl198/data/Syperposition/dock_av4'
     tanimoto_cutoff = 0.75
     clash_cutoff_A = 4
-    clash_size_cutoff = 0.3
+    clash_size_cutoff = 0.9
 
 def parse_FLAG():
     try:

@@ -43,6 +43,8 @@ def calculate_mean(filePath,k=10):
     df.to_csv(os.path.join(FLAGS.destPath, filename.replace('.', 'mean_{}_curve.'.format(k))))
 
 
+
+
 def calculate(filePath):
     '''
     Given csv store smina score, calculate the auc based on the best position's smina score

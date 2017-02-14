@@ -22,7 +22,6 @@ class Score(orchestra_job):
     def __init__(self):
         self.parse()
 
-        try_create_chain_parent_folder(self.workplace)
         try_create_chain_parent_folder(self.formsPath)
 
     def scoring(self,crystal_path):

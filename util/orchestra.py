@@ -13,17 +13,23 @@ from createfolder import try_create_chain_folder,try_create_chain_parent_folder
 class orchestra_job:
 
 
-    def get(self,dataframe,index):
+    def get(self, dataframe, begin, end=None):
         '''
 
         :param dataframe: pandas.DataFrame or list
-        :param index:
+        :param begin:
         :return: return index-th value from dataframe
         '''
         if isinstance(dataframe,pd.DataFrame):
-            return dataframe.iloc[index]
+            if end:
+                return dataframe.iloc[begin:end]
+            else:
+                return dataframe.iloc[begin]
         elif isinstance(dataframe,list):
-            return dataframe[index]
+            if end:
+                return dataframe[begin:end]
+            else:
+                return dataframe[begin]
         else:
             message = "doesn't support dataframe type ",type(dataframe)
             raise Exception(message)
@@ -92,7 +98,7 @@ class orchestra_job:
 
         if self.arrayjob:
             linspace = np.linspace(0, len(dataframe), self.jobsize + 1).astype(int)
-            dataframe = dataframe.iloc[linspace[self.jobid - 1]:linspace[self.jobid]]
+            dataframe = self.get(dataframe,linspace[self.jobid - 1],linspace[self.jobid])
 
         if len(dataframe) < self.process_num * self.thread_num:
             for i in range(len(dataframe)):

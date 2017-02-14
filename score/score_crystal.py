@@ -5,7 +5,7 @@ from glob import glob
 import getopt
 sys.path.append(os.path.dirname(sys.path[0]))
 from util.orchestra import orchestra_job
-from util.createfolder import try_create_chain_parent_folder
+from util.createfolder import try_create_chain_folder
 
 smina = '/home/xl198/program/smina/smina.static'
 
@@ -22,7 +22,7 @@ class Score(orchestra_job):
     def __init__(self):
         self.parse()
 
-        try_create_chain_parent_folder(self.formsPath)
+        try_create_chain_folder(self.formsPath)
 
     def scoring(self,crystal_path):
         file_name = os.path.basename(crystal_path)
@@ -34,7 +34,7 @@ class Score(orchestra_job):
         cmd = '{} -r {} -l {} --score_only'.format(self.smina,receptor_file_path,crystal_path)
         print cmd
         result = os.popen(cmd)
-        smina_score = re.search('Affinity: (-?\d+.\d+) \(kcal/mol\)',result).groups()[0]
+        smina_score = re.search('Affinity: (-?\d+.\d+) \(kcal/mol\)',result.read()).groups()[0]
 
         with open(os.path.join(self.formsPath,'score_'+str(self.jobid)+'.txt'),'a') as fout:
             fout.write(ligand_id + ',' + smina_score+'\n')

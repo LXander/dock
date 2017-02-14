@@ -38,15 +38,16 @@ class Blast(orchestra_job):
 
     def blast_func(self,pdb_file):
         pdb_name = os.path.basename(pdb_file).split('.')[0]
+        row_pdb = os.path.join('/n/scratch2/xl198/data/rcsb/row',pdb_name.upper()+'.pdb')
         parsed_xml_name = os.path.basename(pdb_file).replace('.pdb','.xml')
         parsed_xml_path = os.path.join(self.tempFolderPath,parsed_xml_name)
 
-        handle = open(pdb_file,'rU')
-        seqs = []
+        handle = open(row_pdb,'rU')
+        pairs = []
         for record in SeqIO.parse(handle,'pdb-seqres'):
-            seqs.append(record.seq)
+            pairs.append([record.id,record.seq])
 
-        for seq in seqs:
+        for seq_id,seq in pairs:
             seq_size= len(seq)
             result_handle = NCBIWWW.qblast('blastp', 'nr', str(seq))
             blast_records = NCBIXML.read(result_handle)
@@ -56,7 +57,7 @@ class Blast(orchestra_job):
                 for hsp in ali.hsps:
                     records = [hsp.score,hsp.bits,hsp.expect,hsp.identities,hsp.positives]
                     # [pdbname,seq_size,gi,id,type,name,chain]
-                    full_record = [pdb_name,str(seq_size)] + ali_info + records
+                    full_record = [pdb_name,seq_id,str(seq_size)] + ali_info + records
                     self.mutex.acquire()
                     with open(os.path.join(self.formsPath,'blast_'+str(self.jobid)+'.txt'),'a') as fout:
                         fout.write(','.join(full_record)+'\n')

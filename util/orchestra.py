@@ -113,3 +113,30 @@ class orchestra_job:
         for p in process_list:
             print "process end: ", p
             p.join()
+
+    def parse(self):
+        try:
+            opts, args = getopt.getopt(sys.argv[1:], None, ["jobsize=", "jobid=", "cores="])
+        except getopt.GetoptError as err:
+            # print help information and exit:
+            print str(err)  # will print something like "option -a not recognized"
+
+            sys.exit(2)
+
+        for name, value in opts:
+            if name == '--jobsize':
+                self.jobsize = int(value)
+                print "--jobsize ", value
+            if name == '--jobid':
+                self.jobid = int(value)
+                print "--jobid", value
+            if name == '--cores':
+                self.cores = int(value)
+
+        if hasattr(self, "jobsize") and hasattr(self, "jobid"):
+            self.arrayjob = True
+
+        print "orchestra job ", self.arrayjob
+
+        if hasattr(self, 'cores'):
+            print "cores num ", self.cores

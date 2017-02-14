@@ -17,7 +17,7 @@ from util.createfolder import try_create_chain_folder, try_create_chain_parent_f
 from util.orchestra import orchestra_job
 
 
-class blast(orchestra_job):
+class Blast(orchestra_job):
     mutex = threading.Lock()
     arrayjob = False
     workplace = '/n/scratch2/xl198/data'
@@ -67,22 +67,6 @@ class blast(orchestra_job):
         self.convert(receptor_list,self.blast_func)
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 if __name__ == '__main__':
-    parse_FLAG()
-    dockclass = docking('Superposition')
-    dockclass.convert('/n/scratch2/xl198/data/Superposition/forms/docking_pair.csv', dockclass.convert_function)
+    blast = Blast()
+    blast.run_blast()

@@ -21,7 +21,7 @@ class Blast(orchestra_job):
     mutex = threading.Lock()
     arrayjob = False
     workplace = '/n/scratch2/xl198/data'
-    thread_num = 10
+    thread_num = 2
     process_num = 1
 
     def __init__(self):
@@ -55,13 +55,13 @@ class Blast(orchestra_job):
                 # [u'gi', u'209447557', u'pdb', u'3EML', u'A']
                 ali_info = ali.hit_id.split('|')
                 for hsp in ali.hsps:
-                    records = [hsp.score,hsp.bits,hsp.expect,hsp.identities,hsp.positives]
+                    records = [str(hsp.score),str(hsp.bits),str(hsp.expect),str(hsp.identities),str(hsp.positives)]
                     # [pdbname,seq_size,gi,id,type,name,chain]
                     full_record = [pdb_name,seq_id,str(seq_size)] + ali_info + records
                     self.mutex.acquire()
                     with open(os.path.join(self.formsPath,'blast_'+str(self.jobid)+'.txt'),'a') as fout:
                         fout.write(','.join(full_record)+'\n')
-                    self.mutex.releaes()
+                    self.mutex.release()
 
     def run_blast(self):
         receptor_list = glob(os.path.join('/n/scratch2/xl198/data/rcsb/row_receptor','*.pdb'))

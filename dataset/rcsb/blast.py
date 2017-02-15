@@ -36,11 +36,10 @@ class Blast(orchestra_job):
         try_create_chain_folder(self.tempFolderPath)
         try_create_chain_folder(self.formsPath)
 
-    def blast_func(self,pdb_file):
-        pdb_name = os.path.basename(pdb_file).split('.')[0]
+    def blast_func(self,pdb_name):
+
         row_pdb = os.path.join('/n/scratch2/xl198/data/rcsb/row',pdb_name.upper()+'.pdb')
-        parsed_xml_name = os.path.basename(pdb_file).replace('.pdb','.xml')
-        parsed_xml_path = os.path.join(self.tempFolderPath,parsed_xml_name)
+
 
         handle = open(row_pdb,'rU')
         pairs = []
@@ -63,9 +62,24 @@ class Blast(orchestra_job):
                         fout.write(','.join(full_record)+'\n')
                     self.mutex.release()
 
+
+
     def run_blast(self):
-        receptor_list = glob(os.path.join('/n/scratch2/xl198/data/rcsb/row_receptor','*.pdb'))
-        self.convert(receptor_list,self.blast_func)
+        receptor_list = os.listdir('/n/scratch2/xl198/data/rcsb/row_receptor')
+        receptor = map(lambda x:x.split('.')[0],receptor_list)
+
+        print len(receptor)
+
+        converted_receptor = open('/n/scratch2/xl198/data/blast/merged_forms/merged_list.txt').readlines()
+        converted_receptor = map(lambda x:x.strip(),converted_receptor)
+
+        print len(converted_receptor)
+
+        rest_receptor = list(set(receptor) - set(converted_receptor))
+
+        print len(rest_receptor)
+
+        self.convert(rest_receptor,self.blast_func)
 
 
 if __name__ == '__main__':

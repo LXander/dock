@@ -21,6 +21,7 @@ class Blast(orchestra_job):
     mutex = threading.Lock()
     arrayjob = False
     workplace = '/n/scratch2/xl198/data'
+
     thread_num = 2
     process_num = 1
 
@@ -31,10 +32,15 @@ class Blast(orchestra_job):
 
         self.basePath = os.path.join(self.workplace, 'blast')
         self.formsPath = os.path.join(self.basePath,'forms')
+        self.err_log_file =os.path.join(self.basePath,'err.log')
 
 
         try_create_chain_folder(self.tempFolderPath)
         try_create_chain_folder(self.formsPath)
+
+    def err_log(self,message):
+        with open(self.err_log_file,'a') as fout:
+            fout.write(message+'\n')
 
     def blast_func(self,pdb_name):
 
@@ -48,19 +54,23 @@ class Blast(orchestra_job):
 
         for seq_id,seq in pairs:
             seq_size= len(seq)
-            result_handle = NCBIWWW.qblast('blastp', 'nr', str(seq))
-            blast_records = NCBIXML.read(result_handle)
-            for ali in blast_records.alignments:
-                # [u'gi', u'209447557', u'pdb', u'3EML', u'A']
-                ali_info = ali.hit_id.split('|')
-                for hsp in ali.hsps:
-                    records = [str(hsp.score),str(hsp.bits),str(hsp.expect),str(hsp.identities),str(hsp.positives)]
-                    # [pdbname,seq_size,gi,id,type,name,chain]
-                    full_record = [pdb_name,seq_id,str(seq_size)] + ali_info + records
-                    self.mutex.acquire()
-                    with open(os.path.join(self.formsPath,'blast_'+str(self.jobid)+'.txt'),'a') as fout:
-                        fout.write(','.join(full_record)+'\n')
-                    self.mutex.release()
+            try:
+                result_handle = NCBIWWW.qblast('blastp', 'nr', str(seq))
+                blast_records = NCBIXML.read(result_handle)
+                for ali in blast_records.alignments:
+                    # [u'gi', u'209447557', u'pdb', u'3EML', u'A']
+                    ali_info = ali.hit_id.split('|')
+                    for hsp in ali.hsps:
+                        records = [str(hsp.score),str(hsp.bits),str(hsp.expect),str(hsp.identities),str(hsp.positives)]
+                        # [pdbname,seq_size,gi,id,type,name,chain]
+                        full_record = [pdb_name,seq_id,str(seq_size)] + ali_info + records
+                        self.mutex.acquire()
+                        with open(os.path.join(self.formsPath,'blast_'+str(self.jobid)+'.txt'),'a') as fout:
+                            fout.write(','.join(full_record)+'\n')
+                        self.mutex.release()
+            except Exception as e:
+                self.err_log(pdb_name)
+                print e
 
 
 

@@ -33,7 +33,7 @@ class Blast(orchestra_job):
         self.basePath = os.path.join(self.workplace, 'blast')
         self.formsPath = os.path.join(self.basePath,'forms')
         self.err_log_file =os.path.join(self.basePath,'err.log')
-
+        self.mergedPath = os.path.join(self.basePath,'merged_forms')
 
         try_create_chain_folder(self.tempFolderPath)
         try_create_chain_folder(self.formsPath)
@@ -92,6 +92,43 @@ class Blast(orchestra_job):
         self.convert(rest_receptor,self.blast_func)
 
 
+    def merge_blast_result(self):
+
+        blast_result = os.listdir(self.formsPath)
+        blast_result_path = map(lambda x:os.path.join(self.formsPath,x),blast_result)
+
+        # append result in to blast
+        merged_blast = os.path.join(self.mergedPath,'blast.txt')
+        for blast in blast_result_path:
+            with open(merged_blast,'a') as fout:
+                for line in open(blast):
+                    fout.write(line)
+
+        # get blasted receptor name
+        blasted_receptors = []
+        for line in open(merged_blast):
+            blasted_receptors.append(line.split(',')[0])
+
+        # write down the blasted receptor into file
+        blasted_receptors_log  = os.path.join(self.mergedPath,'merged_list.txt')
+        with open(blasted_receptors_log,'w') as fout:
+            for item in blasted_receptors:
+                fout.write(item+'\n')
+
+        # move current forms folder, create a new empty folder
+        count = 1
+        moved_folder = os.path.join(self.basePath,'forms_'+str(count))
+        while(os.path.exists(moved_folder)):
+            count+=1
+            moved_folder = os.path.join(self.basePath, 'forms_' + str(count))
+
+        os.system('mv {} {}'.format(self.formsPath,moved_folder))
+        os.system('mkdir -p {}'.format(self.formsPath))
+
+
+
+
 if __name__ == '__main__':
     blast = Blast()
+    #blast.merge_blast_result()
     blast.run_blast()

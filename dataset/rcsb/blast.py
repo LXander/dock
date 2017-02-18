@@ -69,7 +69,8 @@ class Blast(orchestra_job):
                             fout.write(','.join(full_record)+'\n')
                         self.mutex.release()
             except Exception as e:
-                self.err_log(pdb_name)
+                err = str(e)
+                self.err_log(pdb_name+','+err)
                 print e
 
 
@@ -108,7 +109,7 @@ class Blast(orchestra_job):
         blasted_receptors = []
         for line in open(merged_blast):
             blasted_receptors.append(line.split(',')[0])
-
+        blasted_receptors = list(set(blasted_receptors))
         # write down the blasted receptor into file
         blasted_receptors_log  = os.path.join(self.mergedPath,'merged_list.txt')
         with open(blasted_receptors_log,'w') as fout:

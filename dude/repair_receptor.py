@@ -19,8 +19,8 @@ def add_hydrogen(filePath):
         cmd = 'obminimize -cg -ff MMFF94 -h -n 500 -o pdb  {} > {}'.format(filePath,filePath.replace("protein","repair"))
         w.write(cmd + '\n')
 
-    #if len(open(filePath.replace("protein","repair")).readlines())==0:
-    os.system('bsub < repair.sh')
+    if len(open(filePath.replace("protein","repair")).readlines())==0:
+        os.system('bsub < repair.sh')
 
 def add_all():
     for receptor in glob(os.path.join('/n/scratch2/xl198/dude/data/receptor/protein','*.pdb')):

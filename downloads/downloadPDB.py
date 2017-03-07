@@ -58,7 +58,7 @@ class parseRCSB:
             self.error_log('can not parse {}.\n'.format(item))
             return None
         
-        hetero = parsed.select('(hetero and not water) or resname ATP or resname ADP')
+        hetero = parsed.select('(hetero and not water) or resname ATP or resname ADP or sesname AMP or resname GTP or resname GDP or resname GMP')
         receptor = parsed.select('protein or nucleic')
         if receptor is None:
             self.error_log("{} doesn't have receptor.\n".format(item))
